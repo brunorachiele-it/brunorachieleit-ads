@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Ad Manager • BrunoRachiele.it</title>
+  <!-- Libreria jsPDF per generare il PDF riepilogativo direttamente dal browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --bg: #f1f5f9;
@@ -17,6 +19,7 @@
       --border: #cbd5e1;
       --success: #16a34a;
       --danger: #dc2626;
+      --pdf: #0284c7;
     }
     * { box-sizing: border-box; }
     body {
@@ -48,7 +51,7 @@
       border-radius: 999px;
     }
     .container {
-      max-width: 1120px;
+      max-width: 1140px;
       margin: 24px auto;
       padding: 0 16px 40px;
     }
@@ -67,31 +70,42 @@
       border-bottom: 1px solid #e2e8f0;
       padding-bottom: 8px;
     }
+    .sub-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--primary);
+      margin: 14px 0 8px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+    }
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 22px;
     }
     .grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
     }
     label {
       display: block;
       font-size: 12.5px;
       font-weight: 700;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       color: var(--dark);
     }
-    input[type="text"], input[type="password"], input[type="url"], input[type="date"], input[type="number"], select {
+    input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="number"], select, textarea {
       width: 100%;
-      padding: 9px 11px;
+      padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 14px;
-      margin-bottom: 12px;
+      font-size: 13.5px;
+      margin-bottom: 10px;
       background: #fff;
+      font-family: inherit;
     }
     input[type="file"] {
       margin-bottom: 12px;
@@ -101,7 +115,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       background: #f8fafc;
       padding: 10px;
       border-radius: 8px;
@@ -114,6 +128,7 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
+      margin: 0;
     }
     .btn {
       display: inline-flex;
@@ -125,12 +140,13 @@
       border: none;
       border-radius: 8px;
       padding: 10px 16px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn:hover { background: var(--primary-hover); }
     .btn-success { background: var(--success); }
+    .btn-pdf { background: var(--pdf); padding: 6px 10px; font-size: 12px; }
     .btn-danger { background: var(--danger); padding: 6px 10px; font-size: 12px; }
     .btn-secondary { background: #475569; padding: 6px 10px; font-size: 12px; }
     .preview-box {
@@ -147,7 +163,7 @@
     }
     .preview-box img {
       max-width: 100%;
-      max-height: 220px;
+      max-height: 210px;
       border-radius: 6px;
       margin-top: 6px;
     }
@@ -184,6 +200,7 @@
     .badge-on { background: #dcfce7; color: #166534; }
     .badge-off { background: #f1f5f9; color: #64748b; }
     .thumb { width: 80px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
+    .actions-cell { display: flex; flex-wrap: wrap; gap: 5px; }
   </style>
 </head>
 <body>
@@ -201,16 +218,16 @@
     <h2>1. Connessione Repository GitHub</h2>
     <div class="grid-3">
       <div>
-        <label>Proprietario GitHub (Username)</label>
-        <input type="text" id="ghOwner" placeholder="es. brunorachiele" />
+        <label>Proprietario / Organizzazione GitHub</label>
+        <input type="text" id="ghOwner" placeholder="brunorachiele-it" />
       </div>
       <div>
         <label>Nome Repository</label>
-        <input type="text" id="ghRepo" placeholder="es. ads.brunorachiele.it" />
+        <input type="text" id="ghRepo" placeholder="brunorachieleit-ads" />
       </div>
       <div>
-        <label>GitHub Personal Access Token (salvato solo nel tuo browser)</label>
-        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" />
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="github_pat_xxxxxxxxxxxx" />
       </div>
     </div>
     <button class="btn" onclick="connectAndLoad()">Salva Credenziali e Carica Campagne</button>
@@ -222,10 +239,10 @@
     <div class="grid-2">
       <div>
         <input type="hidden" id="editId" value="" />
-        <label>Nome Azienda / Partner *</label>
+        <label>Nome Azienda / Brand (visibile nel banner) *</label>
         <input type="text" id="clientName" placeholder="es. Studio Commerciale Rossi" />
 
-        <label>Pacchetto / Etichetta Trasparenza JTI</label>
+        <label>Etichetta Trasparenza JTI</label>
         <select id="adLabel">
           <option value="Spazio Sponsorizzato">Spazio Sponsorizzato (Standard)</option>
           <option value="Main Partner">Main Partner (Premium)</option>
@@ -254,10 +271,43 @@
             <input type="date" id="endDate" />
           </div>
           <div>
-            <label>Priorità Rotazione (1-5)</label>
+            <label>Priorità (1-5)</label>
             <input type="number" id="weight" min="1" max="5" value="1" />
           </div>
         </div>
+
+        <!-- DATI AMMINISTRATIVI PER RIEPILOGO PDF -->
+        <div class="sub-section-title">Dati Cliente per Riepilogo PDF (uso interno)</div>
+        <div class="grid-2" style="gap:10px;">
+          <div>
+            <label>Referente / Legale Rappresentante</label>
+            <input type="text" id="contactPerson" placeholder="es. Dott. Mario Rossi" />
+          </div>
+          <div>
+            <label>P.IVA / Codice Fiscale</label>
+            <input type="text" id="vatNumber" placeholder="es. IT01234567890" />
+          </div>
+        </div>
+        <div class="grid-2" style="gap:10px;">
+          <div>
+            <label>Email / Telefono Cliente</label>
+            <input type="text" id="clientEmail" placeholder="es. info@studiorossi.it" />
+          </div>
+          <div>
+            <label>Pacchetto / Tariffa Concordata</label>
+            <select id="planTier">
+              <option value="START Mensile (25,00 € / mese)">START Mensile (25,00 € / mese)</option>
+              <option value="START Annuale (250,00 € / anno)">START Annuale (250,00 € / anno)</option>
+              <option value="BUSINESS Mensile (50,00 € / mese)">BUSINESS Mensile (50,00 € / mese)</option>
+              <option value="BUSINESS Annuale (500,00 € / anno)">BUSINESS Annuale (500,00 € / anno)</option>
+              <option value="MAIN PARTNER Mensile (100,00 € / mese)">MAIN PARTNER Mensile (100,00 € / mese)</option>
+              <option value="MAIN PARTNER Annuale (1.000,00 € / anno)">MAIN PARTNER Annuale (1.000,00 € / anno)</option>
+              <option value="Promo Interna / Omaggio (0,00 €)">Promo Interna / Omaggio (0,00 €)</option>
+            </select>
+          </div>
+        </div>
+        <label>Note aggiuntive (es. Rassegna Stampa, Lettera d'Intenti, Redazionale)</label>
+        <input type="text" id="adminNotes" placeholder="es. Pre-adesione con Lettera d'Intenti - Rassegna Stampa inclusa" />
       </div>
 
       <div>
@@ -274,9 +324,10 @@
           <span id="prevPlaceholder" style="color:#94a3b8; font-size:13px;">Seleziona un'immagine per vedere l'anteprima</span>
         </div>
 
-        <div style="margin-top:16px; display:flex; gap:10px;">
+        <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:10px;">
           <button class="btn btn-success" onclick="saveCampaign()">Pubblica sul Sito</button>
-          <button class="btn btn-secondary" onclick="resetForm()">Annulla / Pulisci</button>
+          <button class="btn btn-pdf" style="padding:10px 14px; font-size:13.5px;" onclick="generateFormPreviewPDF()">Anteprima PDF Riepilogo</button>
+          <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetForm()">Pulisci</button>
         </div>
       </div>
     </div>
@@ -290,7 +341,7 @@
         <thead>
           <tr>
             <th>Banner</th>
-            <th>Cliente</th>
+            <th>Cliente &amp; Piano</th>
             <th>Slot Assegnati</th>
             <th>Validità</th>
             <th>Stato</th>
@@ -309,6 +360,13 @@
   let currentConfig = { version: "1.0", updatedAt: "", campaigns: [] };
   let configSha = null;
 
+  const SLOT_LABELS = {
+    "header-top": "Testata (Header Top)",
+    "sidebar-rassegna": "Sidebar Rassegna Stampa",
+    "in-article-1": "Dentro gli Articoli",
+    "footer-partner": "Footer Partner"
+  };
+
   function showStatus(msg, type) {
     const bar = document.getElementById("statusBar");
     bar.textContent = msg;
@@ -316,8 +374,8 @@
   }
 
   function loadStoredCreds() {
-    document.getElementById("ghOwner").value = localStorage.getItem("br_ads_owner") || "";
-    document.getElementById("ghRepo").value = localStorage.getItem("br_ads_repo") || "ads.brunorachiele.it";
+    document.getElementById("ghOwner").value = localStorage.getItem("br_ads_owner") || "brunorachiele-it";
+    document.getElementById("ghRepo").value = localStorage.getItem("br_ads_repo") || "brunorachieleit-ads";
     document.getElementById("ghToken").value = localStorage.getItem("br_ads_token") || "";
     const today = new Date().toISOString().slice(0, 10);
     document.getElementById("startDate").value = today;
@@ -328,7 +386,7 @@
     const repo = document.getElementById("ghRepo").value.trim();
     const token = document.getElementById("ghToken").value.trim();
     if (!owner || !repo || !token) {
-      showStatus("Compila Username, Repository e Token GitHub prima di procedere.", "err");
+      showStatus("Compila Proprietario, Repository e Token GitHub prima di procedere.", "err");
       return null;
     }
     localStorage.setItem("br_ads_owner", owner);
@@ -459,6 +517,14 @@
     let imageUrl = document.getElementById("imageUrl").value.trim();
     const editId = document.getElementById("editId").value;
 
+    const billing = {
+      contactPerson: document.getElementById("contactPerson").value.trim(),
+      vatNumber: document.getElementById("vatNumber").value.trim(),
+      clientEmail: document.getElementById("clientEmail").value.trim(),
+      planTier: document.getElementById("planTier").value,
+      adminNotes: document.getElementById("adminNotes").value.trim()
+    };
+
     if (!client || !targetUrl || slots.length === 0) {
       showStatus("Inserisci Nome Azienda, Link di destinazione e almeno uno Slot.", "err");
       return;
@@ -488,7 +554,8 @@
         imageUrl,
         targetUrl,
         altText: client,
-        label
+        label,
+        billing
       };
 
       if (editId) {
@@ -519,6 +586,14 @@
     document.getElementById("endDate").value = c.endDate || "";
     document.getElementById("weight").value = c.weight || 1;
     document.getElementById("imageUrl").value = c.imageUrl;
+
+    const b = c.billing || {};
+    document.getElementById("contactPerson").value = b.contactPerson || "";
+    document.getElementById("vatNumber").value = b.vatNumber || "";
+    document.getElementById("clientEmail").value = b.clientEmail || "";
+    if (b.planTier) document.getElementById("planTier").value = b.planTier;
+    document.getElementById("adminNotes").value = b.adminNotes || "";
+
     document.querySelectorAll(".slot-cb").forEach(cb => {
       cb.checked = c.slots.includes(cb.value);
     });
@@ -566,8 +641,158 @@
     document.getElementById("bannerFile").value = "";
     document.getElementById("endDate").value = "";
     document.getElementById("weight").value = 1;
+    document.getElementById("contactPerson").value = "";
+    document.getElementById("vatNumber").value = "";
+    document.getElementById("clientEmail").value = "";
+    document.getElementById("adminNotes").value = "";
     document.getElementById("prevImg").style.display = "none";
     document.getElementById("prevPlaceholder").style.display = "block";
+  }
+
+  // GENERAZIONE PDF RIEPILOGO CLIENTE
+  function buildSummaryPDF(c) {
+    if (!window.jspdf) {
+      showStatus("Libreria PDF non ancora caricata, riprova tra un secondo.", "err");
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const b = c.billing || {};
+    const todayStr = new Date().toLocaleDateString("it-IT");
+
+    // Intestazione Blu Navy
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 210, 38, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("BRUNORACHIELE.IT", 16, 17);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(203, 213, 225);
+    doc.text("Scheda Riepilogativa Campagna Pubblicitaria & Partnership B2B", 16, 25);
+    doc.text("Data emissione: " + todayStr + "  |  ID: " + c.id, 16, 31);
+
+    let y = 50;
+
+    // Sezione 1: Dati Inserzionista
+    doc.setTextColor(30, 58, 138);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("1. DATI INSERZIONISTA / PARTNER", 16, y);
+    doc.setDrawColor(203, 213, 225);
+    doc.line(16, y + 2, 194, y + 2);
+    y += 10;
+
+    const clientRows = [
+      ["Azienda / Brand:", c.client || "-"],
+      ["Referente:", b.contactPerson || "Non specificato"],
+      ["P.IVA / Codice Fiscale:", b.vatNumber || "Non specificato"],
+      ["Contatto Email / Tel:", b.clientEmail || "Non specificato"],
+      ["URL di destinazione:", c.targetUrl || "-"]
+    ];
+
+    doc.setFontSize(10.5);
+    clientRows.forEach(([k, v]) => {
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(71, 85, 105);
+      doc.text(k, 16, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      const lines = doc.splitTextToSize(String(v), 125);
+      doc.text(lines, 66, y);
+      y += lines.length * 6 + 2;
+    });
+
+    y += 6;
+
+    // Sezione 2: Dettagli Pacchetto e Posizionamento
+    doc.setTextColor(30, 58, 138);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("2. DETTAGLI PIANO E POSIZIONAMENTO SUL PORTALE", 16, y);
+    doc.line(16, y + 2, 194, y + 2);
+    y += 10;
+
+    const readableSlots = (c.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
+    const planRows = [
+      ["Pacchetto Scelto:", b.planTier || "Personalizzato"],
+      ["Etichetta Trasparenza:", c.label || "Spazio Sponsorizzato"],
+      ["Slot Assegnati:", readableSlots || "-"],
+      ["Periodo di Validità:", `Dal ${c.startDate || "attivazione"} al ${c.endDate || "fino a revoca"}`],
+      ["Stato Attuale:", c.active ? "ATTIVO ONLINE" : "IN PAUSA / PRENOTATO"],
+      ["Note Operative:", b.adminNotes || "Nessuna nota aggiuntiva"]
+    ];
+
+    doc.setFontSize(10.5);
+    planRows.forEach(([k, v]) => {
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(71, 85, 105);
+      doc.text(k, 16, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      const lines = doc.splitTextToSize(String(v), 125);
+      doc.text(lines, 66, y);
+      y += lines.length * 6 + 2;
+    });
+
+    y += 8;
+
+    // Box Trasparenza JTI e Condizioni
+    doc.setFillColor(239, 246, 255);
+    doc.setDrawColor(191, 219, 254);
+    doc.roundedRect(16, y, 178, 34, 3, 3, "FD");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(30, 58, 138);
+    doc.text("TRASPARENZA EDITORIALE (STANDARD JTI) E NOTE AMMINISTRATIVE", 20, y + 7);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.8);
+    doc.setTextColor(30, 41, 59);
+    const jtiText = "In conformità alla Linea Editoriale di BrunoRachiele.it e agli standard europei Journalism Trust Initiative (JTI), tutti gli spazi pubblicitari sono chiaramente contrassegnati da apposita dicitura informativa e restano separati dai contenuti redazionali. Le prenotazioni effettuate tramite Lettera d'Intenti non comportano versamenti anticipati prima dell'avvio operativo dei servizi.";
+    const jtiLines = doc.splitTextToSize(jtiText, 170);
+    doc.text(jtiLines, 20, y + 13);
+
+    // Footer
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text("BrunoRachiele.it • Sede operativa: San Pietro a Maida (CZ) • info@brunorachiele.it • trust.brunorachiele.it", 16, 282);
+
+    const safeFileName = "Riepilogo-ADS-" + (c.client || "Cliente").replace(/[^a-zA-Z0-9]/g, "_") + ".pdf";
+    doc.save(safeFileName);
+  }
+
+  function downloadCampaignPDF(id) {
+    const c = currentConfig.campaigns.find(item => item.id === id);
+    if (!c) return;
+    buildSummaryPDF(c);
+  }
+
+  function generateFormPreviewPDF() {
+    const client = document.getElementById("clientName").value.trim() || "Cliente_Bozza";
+    const slots = Array.from(document.querySelectorAll(".slot-cb:checked")).map(cb => cb.value);
+    const tempObj = {
+      id: document.getElementById("editId").value || "BOZZA-" + Date.now(),
+      client,
+      active: true,
+      slots,
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      targetUrl: document.getElementById("targetUrl").value.trim(),
+      label: document.getElementById("adLabel").value,
+      billing: {
+        contactPerson: document.getElementById("contactPerson").value.trim(),
+        vatNumber: document.getElementById("vatNumber").value.trim(),
+        clientEmail: document.getElementById("clientEmail").value.trim(),
+        planTier: document.getElementById("planTier").value,
+        adminNotes: document.getElementById("adminNotes").value.trim()
+      }
+    };
+    buildSummaryPDF(tempObj);
   }
 
   function renderTable() {
@@ -577,20 +802,25 @@
       return;
     }
 
-    tbody.innerHTML = currentConfig.campaigns.map(c => `
+    tbody.innerHTML = currentConfig.campaigns.map(c => {
+      const planInfo = c.billing && c.billing.planTier ? c.billing.planTier : c.label;
+      return `
       <tr>
         <td><img src="${c.imageUrl}" class="thumb" alt="" /></td>
-        <td><strong>${c.client}</strong><br><small style="color:#64748b;">${c.label}</small></td>
+        <td><strong>${c.client}</strong><br><small style="color:#64748b;">${planInfo}</small></td>
         <td>${c.slots.join(", ")}</td>
         <td>${c.startDate || "Sempre"} → ${c.endDate || "Illimitata"}</td>
         <td><span class="badge ${c.active ? "badge-on" : "badge-off"}">${c.active ? "Attivo" : "In pausa"}</span></td>
         <td>
-          <button class="btn btn-secondary" onclick="editCampaign('${c.id}')">Modifica</button>
-          <button class="btn btn-secondary" onclick="toggleCampaign('${c.id}')">${c.active ? "Pausa" : "Attiva"}</button>
-          <button class="btn btn-danger" onclick="deleteCampaign('${c.id}')">Elimina</button>
+          <div class="actions-cell">
+            <button class="btn btn-pdf" onclick="downloadCampaignPDF('${c.id}')" title="Scarica Scheda PDF">PDF</button>
+            <button class="btn btn-secondary" onclick="editCampaign('${c.id}')">Modifica</button>
+            <button class="btn btn-secondary" onclick="toggleCampaign('${c.id}')">${c.active ? "Pausa" : "Attiva"}</button>
+            <button class="btn btn-danger" onclick="deleteCampaign('${c.id}')">Elimina</button>
+          </div>
         </td>
       </tr>
-    `).join("");
+    `}).join("");
   }
 
   loadStoredCreds();
