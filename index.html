@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Ad Manager • brunorachiele.it</title>
-  <!-- Libreria jsPDF per generare il PDF riepilogativo direttamente dal browser -->
+  <title>Ad Manager &amp; CRM • BrunoRachiele.it</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
@@ -29,32 +28,140 @@
       color: var(--text);
       line-height: 1.5;
     }
-    header {
+
+    /* SCHERMATA LOGIN */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    }
+    .login-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+    .login-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .login-box h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: var(--dark);
+    }
+    .login-box p {
+      margin: 0 0 20px;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    /* HEADER E NAVIGAZIONE DASHBOARD */
+    .topbar {
       background: var(--dark);
       color: #fff;
-      padding: 18px 24px;
+      padding: 14px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
     }
-    header h1 {
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-brand h1 {
       margin: 0;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 800;
     }
-    header span {
-      font-size: 12px;
+    .topbar-pill {
+      font-size: 11px;
       background: rgba(255,255,255,0.14);
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 999px;
     }
-    .container {
-      max-width: 1140px;
-      margin: 24px auto;
-      padding: 0 16px 40px;
+    .nav-tabs {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 24px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
     }
+    .nav-tab {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .container {
+      max-width: 1180px;
+      margin: 24px auto;
+      padding: 0 16px 48px;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* KPI CARDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* CARDS & FORM */
     .card {
       background: var(--card);
       border: 1px solid #e2e8f0;
@@ -64,21 +171,16 @@
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     }
     .card h2 {
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       font-size: 17px;
       color: var(--dark);
       border-bottom: 1px solid #e2e8f0;
       padding-bottom: 8px;
-    }
-    .sub-section-title {
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--primary);
-      margin: 14px 0 8px;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .grid-2 {
       display: grid;
@@ -87,7 +189,7 @@
     }
     .grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 12px;
     }
     label {
@@ -97,20 +199,17 @@
       margin-bottom: 4px;
       color: var(--dark);
     }
-    input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="number"], select, textarea {
+    input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="month"], input[type="number"], select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 9px 11px;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 13.5px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       background: #fff;
       font-family: inherit;
     }
-    input[type="file"] {
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
+    input[type="file"] { margin-bottom: 12px; font-size: 13px; }
     .slots-box {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -145,10 +244,18 @@
       cursor: pointer;
     }
     .btn:hover { background: var(--primary-hover); }
+    .btn-block { width: 100%; padding: 12px; font-size: 14.5px; }
     .btn-success { background: var(--success); }
     .btn-pdf { background: var(--pdf); padding: 6px 10px; font-size: 12px; }
     .btn-danger { background: var(--danger); padding: 6px 10px; font-size: 12px; }
     .btn-secondary { background: #475569; padding: 6px 10px; font-size: 12px; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.35);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
     .preview-box {
       border: 2px dashed var(--border);
       border-radius: 10px;
@@ -163,7 +270,7 @@
     }
     .preview-box img {
       max-width: 100%;
-      max-height: 210px;
+      max-height: 200px;
       border-radius: 6px;
       margin-top: 6px;
     }
@@ -178,6 +285,7 @@
     .status-bar.ok { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
     .status-bar.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
     .status-bar.info { display: block; background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -189,7 +297,7 @@
       text-align: left;
       vertical-align: middle;
     }
-    th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--muted); }
+    th { background: #f8fafc; font-size: 11.5px; text-transform: uppercase; color: var(--muted); }
     .badge {
       display: inline-block;
       padding: 3px 8px;
@@ -199,103 +307,177 @@
     }
     .badge-on { background: #dcfce7; color: #166534; }
     .badge-off { background: #f1f5f9; color: #64748b; }
-    .thumb { width: 80px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
+    .thumb { width: 84px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
     .actions-cell { display: flex; flex-wrap: wrap; gap: 5px; }
+    .bar-track {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: var(--primary);
+      height: 100%;
+      border-radius: 999px;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>brunorachiele.it • Piattaforma Gestione Pubblicità</h1>
-  <span>ads.brunorachiele.it</span>
-</header>
+<!-- ==================== 1. SCHERMATA DI ACCESSO ==================== -->
+<div id="loginScreen" class="login-wrapper">
+  <div class="login-box">
+    <span class="login-badge">Area Riservata • BrunoRachiele.it</span>
+    <h1>Accesso Ad Manager</h1>
+    <p>Inserisci le credenziali del repository GitHub per gestire clienti, banner multi-formato e reportistica click.</p>
 
-<div class="container">
-  <div id="statusBar" class="status-bar"></div>
+    <div id="loginError" class="status-bar err"></div>
 
-  <!-- CONNESSIONE GITHUB -->
-  <div class="card">
-    <h2>1. Connessione Repository GitHub</h2>
-    <div class="grid-3">
-      <div>
-        <label>Proprietario / Organizzazione GitHub</label>
-        <input type="text" id="ghOwner" placeholder="brunorachiele-it" />
-      </div>
-      <div>
-        <label>Nome Repository</label>
-        <input type="text" id="ghRepo" placeholder="brunorachieleit-ads" />
-      </div>
-      <div>
-        <label>GitHub Personal Access Token</label>
-        <input type="password" id="ghToken" placeholder="github_pat_xxxxxxxxxxxx" />
-      </div>
+    <label>Proprietario / Organizzazione GitHub</label>
+    <input type="text" id="loginOwner" placeholder="brunorachiele-it" />
+
+    <label>Nome Repository</label>
+    <input type="text" id="loginRepo" placeholder="brunorachieleit-ads" />
+
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="loginToken" placeholder="github_pat_xxxxxxxxxxxx" />
+
+    <button class="btn btn-block" onclick="handleLogin()">Accedi alla Piattaforma</button>
+  </div>
+</div>
+
+<!-- ==================== 2. DASHBOARD PRINCIPALE ==================== -->
+<div id="appShell" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <h1>BrunoRachiele.it • Ad Server &amp; CRM</h1>
+      <span class="topbar-pill" id="repoBadge">brunorachiele-it/brunorachieleit-ads</span>
     </div>
-    <button class="btn" onclick="connectAndLoad()">Salva Credenziali e Carica Campagne</button>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn btn-outline" onclick="refreshAllStats()">Aggiorna Click Live</button>
+      <button class="btn btn-outline" onclick="logout()">Esci</button>
+    </div>
   </div>
 
-  <!-- NUOVA CAMPAGNA / MODIFICA -->
-  <div class="card">
-    <h2 id="formTitle">2. Crea o Modifica Spazio Pubblicitario</h2>
-    <div class="grid-2">
-      <div>
-        <input type="hidden" id="editId" value="" />
-        <label>Nome Azienda / Brand (visibile nel banner) *</label>
-        <input type="text" id="clientName" placeholder="es. Studio Commerciale Rossi" />
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="tab-overview" onclick="switchTab('tab-overview', this)">Panoramica &amp; Statistiche Click</button>
+    <button class="nav-tab" data-tab="tab-clients" onclick="switchTab('tab-clients', this)">Gestione Clienti (Anagrafiche)</button>
+    <button class="nav-tab" data-tab="tab-banners" onclick="switchTab('tab-banners', this)">Gestione Pubblicità (Banner)</button>
+  </div>
 
-        <label>Etichetta Trasparenza JTI</label>
-        <select id="adLabel">
-          <option value="Spazio Sponsorizzato">Spazio Sponsorizzato (Standard)</option>
-          <option value="Main Partner">Main Partner (Premium)</option>
-          <option value="Partner del Territorio">Partner del Territorio</option>
-          <option value="Spazio Disponibile">Spazio Disponibile (Promo interna)</option>
-        </select>
+  <div class="container">
+    <div id="statusBar" class="status-bar"></div>
 
-        <label>Link di Destinazione (URL cliccabile) *</label>
-        <input type="url" id="targetUrl" placeholder="https://www.esempio.it" />
-
-        <label>Dove deve apparire sul sito (Slot) *</label>
-        <div class="slots-box">
-          <label class="slot-item"><input type="checkbox" value="header-top" class="slot-cb" /> Testata (Header Top)</label>
-          <label class="slot-item"><input type="checkbox" value="sidebar-rassegna" class="slot-cb" checked /> Sidebar Rassegna Stampa</label>
-          <label class="slot-item"><input type="checkbox" value="in-article-1" class="slot-cb" /> Dentro gli Articoli</label>
-          <label class="slot-item"><input type="checkbox" value="footer-partner" class="slot-cb" /> Footer Partner</label>
+    <!-- ==================== TAB A: PANORAMICA & CLICK ==================== -->
+    <div id="tab-overview" class="tab-panel active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Click Totali Generati</span>
+          <span class="kpi-value" id="kpiTotalClicks">0</span>
+          <div class="kpi-sub">Su tutti i banner attivi e passati</div>
         </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Click nel Mese Selezionato</span>
+          <span class="kpi-value" id="kpiMonthClicks">0</span>
+          <div class="kpi-sub" id="kpiMonthLabel">Mese corrente</div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Clienti Attivi</span>
+          <span class="kpi-value" id="kpiActiveClients">0</span>
+          <div class="kpi-sub">Inserzionisti in anagrafica</div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Banner Pubblicati</span>
+          <span class="kpi-value" id="kpiActiveBanners">0</span>
+          <div class="kpi-sub">Formati attivi nei vari slot</div>
+        </div>
+      </div>
 
+      <!-- FILTRO MENSILE E REPORT PDF GIORNO PER GIORNO -->
+      <div class="card">
+        <h2>
+          <span>Riepilogo Click Giorno per Giorno (Diviso per Mese)</span>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <select id="statsClientFilter" style="width:auto; margin:0;" onchange="loadMonthlyClickBreakdown()">
+              <option value="ALL">Tutti i Clienti</option>
+            </select>
+            <input type="month" id="statsMonthPicker" style="width:auto; margin:0;" onchange="loadMonthlyClickBreakdown()" />
+            <button class="btn btn-pdf" style="padding:8px 14px; font-size:13px;" onclick="downloadMonthlyClicksPDF()">Scarica PDF Report Click Mese</button>
+          </div>
+        </h2>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:140px;">Data</th>
+                <th style="width:110px;">Click del Giorno</th>
+                <th>Distribuzione Visiva</th>
+                <th>Dettaglio Banner Cliccati</th>
+              </tr>
+            </thead>
+            <tbody id="dailyClicksTable">
+              <tr><td colspan="4" style="color:#64748b;">Caricamento statistiche giornaliere...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CLASSIFICA CLICK PER CLIENTE E BANNER -->
+      <div class="card">
+        <h2>Riepilogo Click Totali per Cliente e Singolo Banner</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Banner / Formato</th>
+                <th>Posizione (Slot)</th>
+                <th>Click Mese</th>
+                <th>Click Totali</th>
+                <th>Report PDF</th>
+              </tr>
+            </thead>
+            <tbody id="bannerStatsTable">
+              <tr><td colspan="6" style="color:#64748b;">Nessun dato disponibile.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB B: GESTIONE CLIENTI ==================== -->
+    <div id="tab-clients" class="tab-panel">
+      <div class="card">
+        <h2 id="clientFormTitle">Nuova Anagrafica Cliente / Inserzionista</h2>
+        <input type="hidden" id="editClientId" value="" />
         <div class="grid-3">
           <div>
-            <label>Data Inizio</label>
-            <input type="date" id="startDate" />
+            <label>Ragione Sociale / Nome Attività *</label>
+            <input type="text" id="cName" placeholder="es. Studio Legale Bianchi" />
           </div>
-          <div>
-            <label>Data Scadenza</label>
-            <input type="date" id="endDate" />
-          </div>
-          <div>
-            <label>Priorità (1-5)</label>
-            <input type="number" id="weight" min="1" max="5" value="1" />
-          </div>
-        </div>
-
-        <!-- DATI AMMINISTRATIVI PER RIEPILOGO PDF -->
-        <div class="sub-section-title">Dati Cliente per Riepilogo PDF (uso interno)</div>
-        <div class="grid-2" style="gap:10px;">
           <div>
             <label>Referente / Legale Rappresentante</label>
-            <input type="text" id="contactPerson" placeholder="es. Dott. Mario Rossi" />
+            <input type="text" id="cContact" placeholder="es. Avv. Luca Bianchi" />
           </div>
           <div>
-            <label>P.IVA / Codice Fiscale</label>
-            <input type="text" id="vatNumber" placeholder="es. IT01234567890" />
+            <label>Partita IVA / Codice Fiscale</label>
+            <input type="text" id="cVat" placeholder="es. IT01234567890" />
           </div>
         </div>
-        <div class="grid-2" style="gap:10px;">
+        <div class="grid-3">
           <div>
-            <label>Email / Telefono Cliente</label>
-            <input type="text" id="clientEmail" placeholder="es. info@studiorossi.it" />
+            <label>Email Cliente</label>
+            <input type="email" id="cEmail" placeholder="es. info@studiobianchi.it" />
           </div>
           <div>
-            <label>Pacchetto / Tariffa Concordata</label>
-            <select id="planTier">
+            <label>Telefono / WhatsApp</label>
+            <input type="text" id="cPhone" placeholder="es. +39 333 1234567" />
+          </div>
+          <div>
+            <label>Pacchetto Commerciale</label>
+            <select id="cPlan">
               <option value="START Mensile (25,00 € / mese)">START Mensile (25,00 € / mese)</option>
               <option value="START Annuale (250,00 € / anno)">START Annuale (250,00 € / anno)</option>
               <option value="BUSINESS Mensile (50,00 € / mese)">BUSINESS Mensile (50,00 € / mese)</option>
@@ -306,63 +488,151 @@
             </select>
           </div>
         </div>
-        <label>Note aggiuntive (es. Rassegna Stampa, Lettera d'Intenti, Redazionale)</label>
-        <input type="text" id="adminNotes" placeholder="es. Pre-adesione con Lettera d'Intenti - Rassegna Stampa inclusa" />
+        <div class="grid-2">
+          <div>
+            <label>Etichetta Trasparenza Predefinita (Standard JTI)</label>
+            <select id="cDefaultLabel">
+              <option value="Spazio Sponsorizzato">Spazio Sponsorizzato</option>
+              <option value="Main Partner">Main Partner</option>
+              <option value="Partner del Territorio">Partner del Territorio</option>
+              <option value="Spazio Disponibile">Spazio Disponibile</option>
+            </select>
+          </div>
+          <div>
+            <label>Note Contrattuali (es. Lettera d'Intenti, Rassegna Stampa inclusa)</label>
+            <input type="text" id="cNotes" placeholder="es. Adesione senza anticipo - Rassegna Stampa attiva" />
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-success" onclick="saveClient()">Salva Anagrafica Cliente</button>
+          <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetClientForm()">Pulisci Campi</button>
+        </div>
       </div>
 
-      <div>
-        <label>Carica Immagine Banner (PNG, JPG, WebP)</label>
-        <input type="file" id="bannerFile" accept="image/*" onchange="previewLocalFile()" />
-
-        <label>Oppure URL Immagine già caricata</label>
-        <input type="url" id="imageUrl" placeholder="https://ads.brunorachiele.it/banners/..." oninput="updatePreviewFromUrl()" />
-
-        <label>Anteprima Live sul Sito</label>
-        <div class="preview-box" id="previewBox">
-          <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;" id="prevLabel">Spazio Sponsorizzato</span>
-          <img id="prevImg" src="" alt="Anteprima" style="display:none;" />
-          <span id="prevPlaceholder" style="color:#94a3b8; font-size:13px;">Seleziona un'immagine per vedere l'anteprima</span>
-        </div>
-
-        <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:10px;">
-          <button class="btn btn-success" onclick="saveCampaign()">Pubblica sul Sito</button>
-          <button class="btn btn-pdf" style="padding:10px 14px; font-size:13.5px;" onclick="generateFormPreviewPDF()">Anteprima PDF Riepilogo</button>
-          <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetForm()">Pulisci</button>
+      <div class="card">
+        <h2>Elenco Clienti Registrati</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente / Azienda</th>
+                <th>Contatti &amp; P.IVA</th>
+                <th>Pacchetto</th>
+                <th>Banner Attivi</th>
+                <th>Stato</th>
+                <th>Azioni &amp; PDF Anagrafica</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTable">
+              <tr><td colspan="6" style="color:#64748b;">Nessun cliente registrato.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- LISTA CAMPAGNE ATTIVE -->
-  <div class="card">
-    <h2>3. Campagne Attive e Programmate</h2>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead>
-          <tr>
-            <th>Banner</th>
-            <th>Cliente &amp; Piano</th>
-            <th>Slot Assegnati</th>
-            <th>Validità</th>
-            <th>Stato</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody id="campaignsTable">
-          <tr><td colspan="6" style="color:#64748b;">Inserisci le credenziali GitHub in alto e clicca su "Salva Credenziali e Carica Campagne".</td></tr>
-        </tbody>
-      </table>
+    <!-- ==================== TAB C: GESTIONE PUBBLICITÀ (BANNER) ==================== -->
+    <div id="tab-banners" class="tab-panel">
+      <div class="card">
+        <h2 id="bannerFormTitle">Aggiungi Banner Pubblicitario a un Cliente</h2>
+        <div class="grid-2">
+          <div>
+            <input type="hidden" id="editBannerId" value="" />
+
+            <label>Seleziona Cliente *</label>
+            <select id="bClientId"></select>
+
+            <label>Nome / Formato del Banner (per riconoscerlo nei report) *</label>
+            <input type="text" id="bTitle" placeholder="es. Banner Orizzontale Header oppure Banner Quadrato Sidebar" />
+
+            <label>Link di Destinazione (URL cliccabile) *</label>
+            <input type="url" id="bTargetUrl" placeholder="https://www.sito-cliente.it" />
+
+            <label>Posizione sul Sito (Slot) *</label>
+            <div class="slots-box">
+              <label class="slot-item"><input type="checkbox" value="header-top" class="slot-cb" /> Testata Alta (Header Top)</label>
+              <label class="slot-item"><input type="checkbox" value="sidebar-rassegna" class="slot-cb" checked /> Sidebar (Laterale)</label>
+              <label class="slot-item"><input type="checkbox" value="in-article-1" class="slot-cb" /> Dentro gli Articoli</label>
+              <label class="slot-item"><input type="checkbox" value="footer-partner" class="slot-cb" /> Footer Partner</label>
+            </div>
+
+            <div class="grid-3">
+              <div>
+                <label>Data Inizio</label>
+                <input type="date" id="bStartDate" />
+              </div>
+              <div>
+                <label>Data Scadenza</label>
+                <input type="date" id="bEndDate" />
+              </div>
+              <div>
+                <label>Priorità (1-5)</label>
+                <input type="number" id="bWeight" min="1" max="5" value="1" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label>Carica Immagine Banner (PNG, JPG, WebP)</label>
+            <input type="file" id="bFile" accept="image/*" onchange="previewLocalBanner()" />
+
+            <label>Oppure URL Immagine già caricata</label>
+            <input type="url" id="bImageUrl" placeholder="https://ads.brunorachiele.it/banners/..." oninput="updatePreviewFromUrl()" />
+
+            <label>Anteprima Banner</label>
+            <div class="preview-box">
+              <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;">Spazio Sponsorizzato</span>
+              <img id="bPrevImg" src="" alt="Anteprima" style="display:none;" />
+              <span id="bPrevPlaceholder" style="color:#94a3b8; font-size:13px;">Carica un'immagine (orizzontale per testata o quadrata/verticale per sidebar)</span>
+            </div>
+
+            <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-success" onclick="saveBanner()">Pubblica Banner sul Sito</button>
+              <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetBannerForm()">Annulla / Pulisci</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tutti i Banner Pubblicati (Multi-Formato)</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Anteprima</th>
+                <th>Cliente &amp; Formato</th>
+                <th>Slot Assegnati</th>
+                <th>Validità</th>
+                <th>Click Totali</th>
+                <th>Stato</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="bannersTable">
+              <tr><td colspan="7" style="color:#64748b;">Nessun banner inserito.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
 
 <script>
-  let currentConfig = { version: "1.0", updatedAt: "", campaigns: [] };
+  const COUNTER_NAMESPACE = "brunorachiele_ads_v2";
+  let creds = null;
   let configSha = null;
+  let db = { version: "2.0", updatedAt: "", clients: [], banners: [] };
+
+  // Cache dei click letti dal server: { bannerId: { total: N, byDate: { "2026-11-25": X } } }
+  let liveClickStats = {};
+  let currentMonthlyRows = [];
 
   const SLOT_LABELS = {
-    "header-top": "Testata (Header Top)",
-    "sidebar-rassegna": "Sidebar Rassegna Stampa",
+    "header-top": "Testata Alta (Header Top)",
+    "sidebar-rassegna": "Sidebar (Laterale)",
     "in-article-1": "Dentro gli Articoli",
     "footer-partner": "Footer Partner"
   };
@@ -373,78 +643,268 @@
     bar.className = "status-bar " + type;
   }
 
-  function loadStoredCreds() {
-    document.getElementById("ghOwner").value = localStorage.getItem("br_ads_owner") || "brunorachiele-it";
-    document.getElementById("ghRepo").value = localStorage.getItem("br_ads_repo") || "brunorachieleit-ads";
-    document.getElementById("ghToken").value = localStorage.getItem("br_ads_token") || "";
-    const today = new Date().toISOString().slice(0, 10);
-    document.getElementById("startDate").value = today;
+  function switchTab(tabId, btnEl) {
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-tab").forEach(b => b.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
+    if (btnEl) btnEl.classList.add("active");
   }
 
-  function getCreds() {
-    const owner = document.getElementById("ghOwner").value.trim();
-    const repo = document.getElementById("ghRepo").value.trim();
-    const token = document.getElementById("ghToken").value.trim();
-    if (!owner || !repo || !token) {
-      showStatus("Compila Proprietario, Repository e Token GitHub prima di procedere.", "err");
-      return null;
+  // ==================== AUTENTICAZIONE ====================
+  function initLoginScreen() {
+    document.getElementById("loginOwner").value = localStorage.getItem("br_ads_owner") || "brunorachiele-it";
+    document.getElementById("loginRepo").value = localStorage.getItem("br_ads_repo") || "brunorachieleit-ads";
+    const savedToken = localStorage.getItem("br_ads_token") || "";
+    document.getElementById("loginToken").value = savedToken;
+
+    if (savedToken) {
+      handleLogin(true);
     }
-    localStorage.setItem("br_ads_owner", owner);
-    localStorage.setItem("br_ads_repo", repo);
-    localStorage.setItem("br_ads_token", token);
-    return { owner, repo, token };
   }
 
-  async function connectAndLoad() {
-    const creds = getCreds();
-    if (!creds) return;
-    showStatus("Connessione a GitHub in corso...", "info");
+  async function handleLogin(isAuto = false) {
+    const owner = document.getElementById("loginOwner").value.trim();
+    const repo = document.getElementById("loginRepo").value.trim();
+    const token = document.getElementById("loginToken").value.trim();
+    const errBox = document.getElementById("loginError");
+
+    if (!owner || !repo || !token) {
+      errBox.textContent = "Compila tutti e tre i campi per accedere.";
+      errBox.style.display = "block";
+      return;
+    }
+
+    errBox.style.display = "none";
 
     try {
-      const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/ads-config.json`;
       const res = await fetch(url, {
         headers: {
-          "Authorization": `Bearer ${creds.token}`,
+          "Authorization": `Bearer ${token}`,
           "Accept": "application/vnd.github+json"
         }
       });
 
-      if (!res.ok) throw new Error("Impossibile leggere ads-config.json (verifica nome repo e permessi Token).");
+      if (!res.ok) {
+        throw new Error("Accesso negato: verifica Proprietario, Nome Repository e permessi del Token.");
+      }
+
       const data = await res.json();
       configSha = data.sha;
       const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
-      currentConfig = JSON.parse(decoded);
-      renderTable();
-      showStatus("Connesso con successo! Campagne caricate.", "ok");
+      const parsed = JSON.parse(decoded);
+
+      // Migrazione automatica se esistevano vecchie "campaigns"
+      db.clients = Array.isArray(parsed.clients) ? parsed.clients : [];
+      db.banners = Array.isArray(parsed.banners) ? parsed.banners : [];
+
+      if (Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0 && db.banners.length === 0) {
+        parsed.campaigns.forEach(old => {
+          const cid = "cli-" + old.id;
+          db.clients.push({
+            id: cid,
+            name: old.client,
+            contactPerson: (old.billing && old.billing.contactPerson) || "",
+            vatNumber: (old.billing && old.billing.vatNumber) || "",
+            email: (old.billing && old.billing.clientEmail) || "",
+            phone: "",
+            planTier: (old.billing && old.billing.planTier) || "START Mensile (25,00 € / mese)",
+            defaultLabel: old.label || "Spazio Sponsorizzato",
+            notes: (old.billing && old.billing.adminNotes) || "",
+            active: old.active !== false
+          });
+          db.banners.push({
+            id: old.id,
+            clientId: cid,
+            title: "Banner Principale",
+            slots: old.slots || ["sidebar-rassegna"],
+            weight: old.weight || 1,
+            startDate: old.startDate || "",
+            endDate: old.endDate || "",
+            imageUrl: old.imageUrl || "",
+            targetUrl: old.targetUrl || "",
+            label: old.label || "Spazio Sponsorizzato",
+            active: old.active !== false
+          });
+        });
+      }
+
+      creds = { owner, repo, token };
+      localStorage.setItem("br_ads_owner", owner);
+      localStorage.setItem("br_ads_repo", repo);
+      localStorage.setItem("br_ads_token", token);
+
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appShell").style.display = "block";
+      document.getElementById("repoBadge").textContent = `${owner}/${repo}`;
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById("bStartDate").value = today;
+      document.getElementById("statsMonthPicker").value = today.slice(0, 7);
+
+      renderAllUI();
+      await refreshAllStats();
+    } catch (e) {
+      if (!isAuto) {
+        errBox.textContent = e.message;
+        errBox.style.display = "block";
+      }
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("br_ads_token");
+    location.reload();
+  }
+
+  // ==================== SALVATAGGIO SU GITHUB ====================
+  async function syncDatabaseToGitHub(commitMsg) {
+    db.updatedAt = new Date().toISOString().slice(0, 10);
+    const jsonString = JSON.stringify(db, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+
+    const apiUrl = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
+    const res = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${creds.token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: commitMsg || "Aggiornamento Ad Server & CRM",
+        content: encoded,
+        sha: configSha
+      })
+    });
+
+    if (!res.ok) throw new Error("Errore durante il salvataggio su GitHub.");
+    const updated = await res.json();
+    configSha = updated.content.sha;
+  }
+
+  // ==================== GESTIONE CLIENTI ====================
+  async function saveClient() {
+    const name = document.getElementById("cName").value.trim();
+    if (!name) {
+      showStatus("Inserisci la Ragione Sociale o il Nome del Cliente.", "err");
+      return;
+    }
+
+    const editId = document.getElementById("editClientId").value;
+    const clientObj = {
+      id: editId || "cli-" + Date.now(),
+      name,
+      contactPerson: document.getElementById("cContact").value.trim(),
+      vatNumber: document.getElementById("cVat").value.trim(),
+      email: document.getElementById("cEmail").value.trim(),
+      phone: document.getElementById("cPhone").value.trim(),
+      planTier: document.getElementById("cPlan").value,
+      defaultLabel: document.getElementById("cDefaultLabel").value,
+      notes: document.getElementById("cNotes").value.trim(),
+      active: true
+    };
+
+    try {
+      showStatus("Salvataggio anagrafica cliente...", "info");
+      if (editId) {
+        const idx = db.clients.findIndex(c => c.id === editId);
+        if (idx !== -1) {
+          clientObj.active = db.clients[idx].active;
+          db.clients[idx] = clientObj;
+        }
+      } else {
+        db.clients.push(clientObj);
+      }
+      await syncDatabaseToGitHub(`Anagrafica cliente: ${name}`);
+      resetClientForm();
+      renderAllUI();
+      showStatus("Anagrafica cliente salvata con successo!", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
-  function previewLocalFile() {
-    const file = document.getElementById("bannerFile").files[0];
+  function editClient(id) {
+    const c = db.clients.find(item => item.id === id);
+    if (!c) return;
+    document.getElementById("clientFormTitle").textContent = "Modifica Cliente: " + c.name;
+    document.getElementById("editClientId").value = c.id;
+    document.getElementById("cName").value = c.name;
+    document.getElementById("cContact").value = c.contactPerson || "";
+    document.getElementById("cVat").value = c.vatNumber || "";
+    document.getElementById("cEmail").value = c.email || "";
+    document.getElementById("cPhone").value = c.phone || "";
+    if (c.planTier) document.getElementById("cPlan").value = c.planTier;
+    if (c.defaultLabel) document.getElementById("cDefaultLabel").value = c.defaultLabel;
+    document.getElementById("cNotes").value = c.notes || "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function toggleClient(id) {
+    const c = db.clients.find(item => item.id === id);
+    if (!c) return;
+    c.active = !c.active;
+    try {
+      showStatus("Aggiornamento stato cliente...", "info");
+      await syncDatabaseToGitHub(`Stato cliente ${c.name}: ${c.active}`);
+      renderAllUI();
+      showStatus("Stato cliente aggiornato.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  async function deleteClient(id) {
+    if (!confirm("Eliminare questo cliente? Verranno scollegati anche i suoi banner.")) return;
+    db.clients = db.clients.filter(c => c.id !== id);
+    db.banners = db.banners.filter(b => b.clientId !== id);
+    try {
+      showStatus("Eliminazione cliente...", "info");
+      await syncDatabaseToGitHub("Eliminazione cliente e relativi banner");
+      renderAllUI();
+      showStatus("Cliente eliminato.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  function resetClientForm() {
+    document.getElementById("clientFormTitle").textContent = "Nuova Anagrafica Cliente / Inserzionista";
+    document.getElementById("editClientId").value = "";
+    document.getElementById("cName").value = "";
+    document.getElementById("cContact").value = "";
+    document.getElementById("cVat").value = "";
+    document.getElementById("cEmail").value = "";
+    document.getElementById("cPhone").value = "";
+    document.getElementById("cNotes").value = "";
+  }
+
+  // ==================== GESTIONE BANNER MULTI-FORMATO ====================
+  function previewLocalBanner() {
+    const file = document.getElementById("bFile").files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function (e) {
-      const img = document.getElementById("prevImg");
+      const img = document.getElementById("bPrevImg");
       img.src = e.target.result;
       img.style.display = "block";
-      document.getElementById("prevPlaceholder").style.display = "none";
+      document.getElementById("bPrevPlaceholder").style.display = "none";
     };
     reader.readAsDataURL(file);
   }
 
   function updatePreviewFromUrl() {
-    const url = document.getElementById("imageUrl").value.trim();
-    const img = document.getElementById("prevImg");
+    const url = document.getElementById("bImageUrl").value.trim();
+    const img = document.getElementById("bPrevImg");
     if (url) {
       img.src = url;
       img.style.display = "block";
-      document.getElementById("prevPlaceholder").style.display = "none";
+      document.getElementById("bPrevPlaceholder").style.display = "none";
     }
   }
 
-  async function uploadBannerToGitHub(creds, file) {
+  async function uploadBannerFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async function () {
@@ -477,353 +937,527 @@
     });
   }
 
-  async function pushConfigToGitHub(creds) {
-    currentConfig.updatedAt = new Date().toISOString().slice(0, 10);
-    const jsonString = JSON.stringify(currentConfig, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
-
-    const apiUrl = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
-    const res = await fetch(apiUrl, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${creds.token}`,
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Aggiornamento campagne pubblicitarie",
-        content: encoded,
-        sha: configSha
-      })
-    });
-
-    if (!res.ok) throw new Error("Errore nel salvataggio di ads-config.json.");
-    const updated = await res.json();
-    configSha = updated.content.sha;
-  }
-
-  async function saveCampaign() {
-    const creds = getCreds();
-    if (!creds) return;
-
-    const client = document.getElementById("clientName").value.trim();
-    const targetUrl = document.getElementById("targetUrl").value.trim();
-    const label = document.getElementById("adLabel").value;
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-    const weight = Number(document.getElementById("weight").value) || 1;
+  async function saveBanner() {
+    const clientId = document.getElementById("bClientId").value;
+    const title = document.getElementById("bTitle").value.trim();
+    const targetUrl = document.getElementById("bTargetUrl").value.trim();
+    const startDate = document.getElementById("bStartDate").value;
+    const endDate = document.getElementById("bEndDate").value;
+    const weight = Number(document.getElementById("bWeight").value) || 1;
     const slots = Array.from(document.querySelectorAll(".slot-cb:checked")).map(cb => cb.value);
-    const file = document.getElementById("bannerFile").files[0];
-    let imageUrl = document.getElementById("imageUrl").value.trim();
-    const editId = document.getElementById("editId").value;
+    const file = document.getElementById("bFile").files[0];
+    let imageUrl = document.getElementById("bImageUrl").value.trim();
+    const editId = document.getElementById("editBannerId").value;
 
-    const billing = {
-      contactPerson: document.getElementById("contactPerson").value.trim(),
-      vatNumber: document.getElementById("vatNumber").value.trim(),
-      clientEmail: document.getElementById("clientEmail").value.trim(),
-      planTier: document.getElementById("planTier").value,
-      adminNotes: document.getElementById("adminNotes").value.trim()
-    };
-
-    if (!client || !targetUrl || slots.length === 0) {
-      showStatus("Inserisci Nome Azienda, Link di destinazione e almeno uno Slot.", "err");
+    if (!clientId) {
+      showStatus("Crea prima almeno un Cliente nella scheda 'Gestione Clienti'.", "err");
       return;
     }
-
+    if (!title || !targetUrl || slots.length === 0) {
+      showStatus("Inserisci Nome/Formato banner, URL di destinazione e almeno uno Slot.", "err");
+      return;
+    }
     if (!file && !imageUrl) {
       showStatus("Carica un file immagine oppure incolla l'URL del banner.", "err");
       return;
     }
 
-    try {
-      showStatus("Salvataggio e pubblicazione in corso...", "info");
-      if (!configSha) await connectAndLoad();
+    const owner = db.clients.find(c => c.id === clientId);
 
+    try {
+      showStatus("Pubblicazione banner in corso...", "info");
       if (file) {
-        imageUrl = await uploadBannerToGitHub(creds, file);
+        imageUrl = await uploadBannerFile(file);
       }
 
-      const campaignObj = {
-        id: editId || "ad-" + Date.now(),
-        client,
-        active: true,
+      const bannerObj = {
+        id: editId || "ad_" + Date.now(),
+        clientId,
+        title,
         slots,
         weight,
         startDate,
         endDate,
         imageUrl,
         targetUrl,
-        altText: client,
-        label,
-        billing
+        label: owner ? owner.defaultLabel : "Spazio Sponsorizzato",
+        active: true
       };
 
       if (editId) {
-        const idx = currentConfig.campaigns.findIndex(c => c.id === editId);
-        if (idx !== -1) currentConfig.campaigns[idx] = campaignObj;
+        const idx = db.banners.findIndex(b => b.id === editId);
+        if (idx !== -1) {
+          bannerObj.active = db.banners[idx].active;
+          db.banners[idx] = bannerObj;
+        }
       } else {
-        currentConfig.campaigns.push(campaignObj);
+        db.banners.push(bannerObj);
       }
 
-      await pushConfigToGitHub(creds);
-      renderTable();
-      resetForm();
-      showStatus("Pubblicato! Il banner sarà visibile sul sito entro 1-2 minuti.", "ok");
+      await syncDatabaseToGitHub(`Pubblicazione banner: ${title}`);
+      resetBannerForm();
+      renderAllUI();
+      showStatus("Banner pubblicato! Sarà visibile sul sito entro 1-2 minuti.", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
-  function editCampaign(id) {
-    const c = currentConfig.campaigns.find(item => item.id === id);
-    if (!c) return;
-    document.getElementById("formTitle").textContent = "Modifica Campagna: " + c.client;
-    document.getElementById("editId").value = c.id;
-    document.getElementById("clientName").value = c.client;
-    document.getElementById("adLabel").value = c.label || "Spazio Sponsorizzato";
-    document.getElementById("targetUrl").value = c.targetUrl;
-    document.getElementById("startDate").value = c.startDate || "";
-    document.getElementById("endDate").value = c.endDate || "";
-    document.getElementById("weight").value = c.weight || 1;
-    document.getElementById("imageUrl").value = c.imageUrl;
-
-    const b = c.billing || {};
-    document.getElementById("contactPerson").value = b.contactPerson || "";
-    document.getElementById("vatNumber").value = b.vatNumber || "";
-    document.getElementById("clientEmail").value = b.clientEmail || "";
-    if (b.planTier) document.getElementById("planTier").value = b.planTier;
-    document.getElementById("adminNotes").value = b.adminNotes || "";
-
+  function editBanner(id) {
+    const b = db.banners.find(item => item.id === id);
+    if (!b) return;
+    document.getElementById("bannerFormTitle").textContent = "Modifica Banner: " + b.title;
+    document.getElementById("editBannerId").value = b.id;
+    document.getElementById("bClientId").value = b.clientId;
+    document.getElementById("bTitle").value = b.title;
+    document.getElementById("bTargetUrl").value = b.targetUrl;
+    document.getElementById("bStartDate").value = b.startDate || "";
+    document.getElementById("bEndDate").value = b.endDate || "";
+    document.getElementById("bWeight").value = b.weight || 1;
+    document.getElementById("bImageUrl").value = b.imageUrl;
     document.querySelectorAll(".slot-cb").forEach(cb => {
-      cb.checked = c.slots.includes(cb.value);
+      cb.checked = (b.slots || []).includes(cb.value);
     });
     updatePreviewFromUrl();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function toggleCampaign(id) {
-    const creds = getCreds();
-    if (!creds) return;
-    const c = currentConfig.campaigns.find(item => item.id === id);
-    if (!c) return;
-    c.active = !c.active;
+  async function toggleBanner(id) {
+    const b = db.banners.find(item => item.id === id);
+    if (!b) return;
+    b.active = !b.active;
     try {
-      showStatus("Aggiornamento stato...", "info");
-      await pushConfigToGitHub(creds);
-      renderTable();
-      showStatus("Stato aggiornato.", "ok");
+      showStatus("Aggiornamento stato banner...", "info");
+      await syncDatabaseToGitHub(`Stato banner ${b.title}: ${b.active}`);
+      renderAllUI();
+      showStatus("Stato banner aggiornato.", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
-  async function deleteCampaign(id) {
-    if (!confirm("Vuoi eliminare definitivamente questa campagna?")) return;
-    const creds = getCreds();
-    if (!creds) return;
-    currentConfig.campaigns = currentConfig.campaigns.filter(item => item.id !== id);
+  async function deleteBanner(id) {
+    if (!confirm("Vuoi eliminare definitivamente questo banner?")) return;
+    db.banners = db.banners.filter(b => b.id !== id);
     try {
-      showStatus("Eliminazione in corso...", "info");
-      await pushConfigToGitHub(creds);
-      renderTable();
-      showStatus("Campagna eliminata.", "ok");
+      showStatus("Eliminazione banner...", "info");
+      await syncDatabaseToGitHub("Eliminazione banner");
+      renderAllUI();
+      showStatus("Banner eliminato.", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
-  function resetForm() {
-    document.getElementById("formTitle").textContent = "2. Crea o Modifica Spazio Pubblicitario";
-    document.getElementById("editId").value = "";
-    document.getElementById("clientName").value = "";
-    document.getElementById("targetUrl").value = "";
-    document.getElementById("imageUrl").value = "";
-    document.getElementById("bannerFile").value = "";
-    document.getElementById("endDate").value = "";
-    document.getElementById("weight").value = 1;
-    document.getElementById("contactPerson").value = "";
-    document.getElementById("vatNumber").value = "";
-    document.getElementById("clientEmail").value = "";
-    document.getElementById("adminNotes").value = "";
-    document.getElementById("prevImg").style.display = "none";
-    document.getElementById("prevPlaceholder").style.display = "block";
+  function resetBannerForm() {
+    document.getElementById("bannerFormTitle").textContent = "Aggiungi Banner Pubblicitario a un Cliente";
+    document.getElementById("editBannerId").value = "";
+    document.getElementById("bTitle").value = "";
+    document.getElementById("bTargetUrl").value = "";
+    document.getElementById("bImageUrl").value = "";
+    document.getElementById("bFile").value = "";
+    document.getElementById("bEndDate").value = "";
+    document.getElementById("bWeight").value = 1;
+    document.getElementById("bPrevImg").style.display = "none";
+    document.getElementById("bPrevPlaceholder").style.display = "block";
   }
 
-  // GENERAZIONE PDF RIEPILOGO CLIENTE
-  function buildSummaryPDF(c) {
-    if (!window.jspdf) {
-      showStatus("Libreria PDF non ancora caricata, riprova tra un secondo.", "err");
-      return;
+  // ==================== STATISTICHE CLICK LIVE & MENSILI ====================
+  async function fetchSingleCounter(key) {
+    try {
+      const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${key}`);
+      if (!res.ok) return 0;
+      const data = await res.json();
+      return Number(data.count) || 0;
+    } catch {
+      return 0;
     }
+  }
+
+  function getDaysInMonth(yearMonth) {
+    const [y, m] = yearMonth.split("-").map(Number);
+    const daysCount = new Date(y, m, 0).getDate();
+    const list = [];
+    for (let d = 1; d <= daysCount; d++) {
+      const dayStr = String(d).padStart(2, "0");
+      list.push(`${yearMonth}-${dayStr}`);
+    }
+    return list;
+  }
+
+  async function refreshAllStats() {
+    await loadMonthlyClickBreakdown();
+  }
+
+  async function loadMonthlyClickBreakdown() {
+    const monthVal = document.getElementById("statsMonthPicker").value || new Date().toISOString().slice(0, 7);
+    const clientFilter = document.getElementById("statsClientFilter").value || "ALL";
+    const tbody = document.getElementById("dailyClicksTable");
+
+    document.getElementById("kpiMonthLabel").textContent = "Mese: " + monthVal;
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Lettura contatori giornalieri in corso...</td></tr>';
+
+    const targetBanners = db.banners.filter(b => clientFilter === "ALL" || b.clientId === clientFilter);
+    const days = getDaysInMonth(monthVal);
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // Filtra fino a oggi se il mese è quello corrente (evita richieste inutili ai giorni futuri)
+    const validDays = days.filter(d => d <= todayStr);
+
+    let monthTotal = 0;
+    const bannerMonthTotals = {};
+    targetBanners.forEach(b => { bannerMonthTotals[b.id] = 0; });
+
+    const dailyResults = [];
+
+    for (const day of validDays) {
+      let daySum = 0;
+      const details = [];
+
+      await Promise.all(targetBanners.map(async (b) => {
+        const safeId = String(b.id).replace(/[^a-zA-Z0-9_-]/g, "_");
+        const count = await fetchSingleCounter(`${safeId}_${day}`);
+        if (count > 0) {
+          daySum += count;
+          bannerMonthTotals[b.id] = (bannerMonthTotals[b.id] || 0) + count;
+          const owner = db.clients.find(c => c.id === b.clientId);
+          details.push(`${owner ? owner.name : "Partner"} (${b.title}): ${count}`);
+        }
+      }));
+
+      monthTotal += daySum;
+      dailyResults.push({ date: day, clicks: daySum, details });
+    }
+
+    currentMonthlyRows = dailyResults;
+
+    // Aggiorna KPI
+    document.getElementById("kpiMonthClicks").textContent = monthTotal;
+    document.getElementById("kpiTotalClicks").textContent = monthTotal;
+    document.getElementById("kpiActiveClients").textContent = db.clients.filter(c => c.active).length;
+    document.getElementById("kpiActiveBanners").textContent = db.banners.filter(b => b.active).length;
+
+    // Render Tabella Giorno per Giorno
+    const maxDay = Math.max(1, ...dailyResults.map(r => r.clicks));
+    if (dailyResults.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Nessun giorno trascorso nel mese selezionato.</td></tr>';
+    } else {
+      tbody.innerHTML = dailyResults.map(r => {
+        const pct = Math.round((r.clicks / maxDay) * 100);
+        const formattedDate = r.date.split("-").reverse().join("/");
+        return `
+          <tr>
+            <td><strong>${formattedDate}</strong></td>
+            <td><span class="badge ${r.clicks > 0 ? "badge-on" : "badge-off"}">${r.clicks} click</span></td>
+            <td>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            </td>
+            <td style="font-size:12.5px; color:#475569;">${r.details.length ? r.details.join(" • ") : "-"}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Render Tabella Riepilogo per Banner
+    const bStatsBody = document.getElementById("bannerStatsTable");
+    if (targetBanners.length === 0) {
+      bStatsBody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessun banner associato.</td></tr>';
+    } else {
+      bStatsBody.innerHTML = targetBanners.map(b => {
+        const owner = db.clients.find(c => c.id === b.clientId);
+        const cClicks = bannerMonthTotals[b.id] || 0;
+        const slotsTxt = (b.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
+        return `
+          <tr>
+            <td><strong>${owner ? owner.name : "N/D"}</strong></td>
+            <td>${b.title}</td>
+            <td>${slotsTxt}</td>
+            <td><strong>${cClicks}</strong></td>
+            <td><strong>${cClicks}</strong></td>
+            <td>
+              <button class="btn btn-pdf" onclick="downloadClientMonthlyPDF('${b.clientId}')">PDF Report Mese</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Aggiorna anche la colonna click nella tabella Gestione Pubblicità
+    db.banners.forEach(b => {
+      const cell = document.getElementById(`b-clicks-${b.id}`);
+      if (cell && bannerMonthTotals[b.id] !== undefined) {
+        cell.textContent = bannerMonthTotals[b.id] + " click";
+      }
+    });
+  }
+
+  // ==================== GENERAZIONE PDF 1: ANAGRAFICA CLIENTE ====================
+  function downloadClientRegistryPDF(clientId) {
+    const c = db.clients.find(item => item.id === clientId);
+    if (!c || !window.jspdf) return;
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const b = c.billing || {};
     const todayStr = new Date().toLocaleDateString("it-IT");
+    const clientBanners = db.banners.filter(b => b.clientId === c.id);
 
-    // Intestazione Blu Navy
+    // Header
     doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 38, "F");
-
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text("BRUNORACHIELE.IT", 16, 17);
-
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(203, 213, 225);
-    doc.text("Scheda Riepilogativa Campagna Pubblicitaria & Partnership B2B", 16, 25);
-    doc.text("Data emissione: " + todayStr + "  |  ID: " + c.id, 16, 31);
+    doc.text("Scheda Anagrafica Cliente & Riepilogo Spazi Pubblicitari B2B", 16, 25);
+    doc.text("Data emissione: " + todayStr + "  |  Codice Cliente: " + c.id, 16, 31);
 
     let y = 50;
-
-    // Sezione 1: Dati Inserzionista
     doc.setTextColor(30, 58, 138);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("1. DATI INSERZIONISTA / PARTNER", 16, y);
+    doc.text("1. ANAGRAFICA INSERZIONISTA", 16, y);
     doc.setDrawColor(203, 213, 225);
     doc.line(16, y + 2, 194, y + 2);
     y += 10;
 
-    const clientRows = [
-      ["Azienda / Brand:", c.client || "-"],
-      ["Referente:", b.contactPerson || "Non specificato"],
-      ["P.IVA / Codice Fiscale:", b.vatNumber || "Non specificato"],
-      ["Contatto Email / Tel:", b.clientEmail || "Non specificato"],
-      ["URL di destinazione:", c.targetUrl || "-"]
+    const rows = [
+      ["Ragione Sociale / Azienda:", c.name],
+      ["Referente:", c.contactPerson || "Non specificato"],
+      ["Partita IVA / Codice Fiscale:", c.vatNumber || "Non specificato"],
+      ["Email:", c.email || "Non specificata"],
+      ["Telefono:", c.phone || "Non specificato"],
+      ["Pacchetto Sottoscritto:", c.planTier || "-"],
+      ["Etichetta Trasparenza JTI:", c.defaultLabel || "Spazio Sponsorizzato"],
+      ["Note Contrattuali:", c.notes || "Nessuna nota aggiuntiva"]
     ];
 
     doc.setFontSize(10.5);
-    clientRows.forEach(([k, v]) => {
+    rows.forEach(([k, v]) => {
       doc.setFont("helvetica", "bold");
       doc.setTextColor(71, 85, 105);
       doc.text(k, 16, y);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(15, 23, 42);
-      const lines = doc.splitTextToSize(String(v), 125);
-      doc.text(lines, 66, y);
+      const lines = doc.splitTextToSize(String(v), 120);
+      doc.text(lines, 72, y);
       y += lines.length * 6 + 2;
     });
 
     y += 6;
-
-    // Sezione 2: Dettagli Pacchetto e Posizionamento
     doc.setTextColor(30, 58, 138);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("2. DETTAGLI PIANO E POSIZIONAMENTO SUL PORTALE", 16, y);
+    doc.text(`2. FORMATI E SPAZI PUBBLICITARI ATTIVI (${clientBanners.length})`, 16, y);
     doc.line(16, y + 2, 194, y + 2);
     y += 10;
 
-    const readableSlots = (c.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
-    const planRows = [
-      ["Pacchetto Scelto:", b.planTier || "Personalizzato"],
-      ["Etichetta Trasparenza:", c.label || "Spazio Sponsorizzato"],
-      ["Slot Assegnati:", readableSlots || "-"],
-      ["Periodo di Validità:", `Dal ${c.startDate || "attivazione"} al ${c.endDate || "fino a revoca"}`],
-      ["Stato Attuale:", c.active ? "ATTIVO ONLINE" : "IN PAUSA / PRENOTATO"],
-      ["Note Operative:", b.adminNotes || "Nessuna nota aggiuntiva"]
-    ];
-
-    doc.setFontSize(10.5);
-    planRows.forEach(([k, v]) => {
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(71, 85, 105);
-      doc.text(k, 16, y);
+    if (clientBanners.length === 0) {
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(15, 23, 42);
-      const lines = doc.splitTextToSize(String(v), 125);
-      doc.text(lines, 66, y);
-      y += lines.length * 6 + 2;
-    });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Nessun banner grafico ancora associato a questa anagrafica.", 16, y);
+      y += 10;
+    } else {
+      clientBanners.forEach((b, index) => {
+        const slotsReadable = (b.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(15, 23, 42);
+        doc.text(`${index + 1}. ${b.title} [${b.active ? "ATTIVO" : "IN PAUSA"}]`, 16, y);
+        y += 5;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(`Posizioni: ${slotsReadable}  |  Validità: ${b.startDate || "Sempre"} -> ${b.endDate || "Illimitata"}`, 20, y);
+        y += 5;
+        doc.text(`URL destinazione: ${b.targetUrl}`, 20, y);
+        y += 8;
+      });
+    }
 
-    y += 8;
-
-    // Box Trasparenza JTI e Condizioni
+    y += 4;
     doc.setFillColor(239, 246, 255);
     doc.setDrawColor(191, 219, 254);
-    doc.roundedRect(16, y, 178, 34, 3, 3, "FD");
-
+    doc.roundedRect(16, y, 178, 32, 3, 3, "FD");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
     doc.setTextColor(30, 58, 138);
-    doc.text("TRASPARENZA EDITORIALE (STANDARD JTI) E NOTE AMMINISTRATIVE", 20, y + 7);
-
+    doc.text("CONFORMITÀ EDITORIALE JTI & CONDIZIONI", 20, y + 7);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.8);
     doc.setTextColor(30, 41, 59);
-    const jtiText = "In conformità alla Linea Editoriale di BrunoRachiele.it e agli standard europei Journalism Trust Initiative (JTI), tutti gli spazi pubblicitari sono chiaramente contrassegnati da apposita dicitura informativa e restano separati dai contenuti redazionali. Le prenotazioni effettuate tramite Lettera d'Intenti non comportano versamenti anticipati prima dell'avvio operativo dei servizi.";
-    const jtiLines = doc.splitTextToSize(jtiText, 170);
-    doc.text(jtiLines, 20, y + 13);
+    const noteJti = "In linea con la Linea Editoriale di BrunoRachiele.it e lo standard europeo Journalism Trust Initiative (JTI), i contenuti promozionali sono sempre contrassegnati da etichetta trasparente e restano indipendenti dalla redazione. Le pre-adesioni tramite Lettera d'Intenti non prevedono versamenti anticipati prima dell'avvio operativo.";
+    doc.text(doc.splitTextToSize(noteJti, 170), 20, y + 13);
 
-    // Footer
     doc.setFontSize(8.5);
     doc.setTextColor(100, 116, 139);
     doc.text("BrunoRachiele.it • Sede operativa: San Pietro a Maida (CZ) • info@brunorachiele.it • trust.brunorachiele.it", 16, 282);
 
-    const safeFileName = "Riepilogo-ADS-" + (c.client || "Cliente").replace(/[^a-zA-Z0-9]/g, "_") + ".pdf";
-    doc.save(safeFileName);
+    doc.save(`Anagrafica_${c.name.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`);
   }
 
-  function downloadCampaignPDF(id) {
-    const c = currentConfig.campaigns.find(item => item.id === id);
-    if (!c) return;
-    buildSummaryPDF(c);
+  // ==================== GENERAZIONE PDF 2: REPORT CLICK GIORNO PER GIORNO ====================
+  function downloadClientMonthlyPDF(clientId) {
+    document.getElementById("statsClientFilter").value = clientId;
+    loadMonthlyClickBreakdown().then(() => {
+      downloadMonthlyClicksPDF();
+    });
   }
 
-  function generateFormPreviewPDF() {
-    const client = document.getElementById("clientName").value.trim() || "Cliente_Bozza";
-    const slots = Array.from(document.querySelectorAll(".slot-cb:checked")).map(cb => cb.value);
-    const tempObj = {
-      id: document.getElementById("editId").value || "BOZZA-" + Date.now(),
-      client,
-      active: true,
-      slots,
-      startDate: document.getElementById("startDate").value,
-      endDate: document.getElementById("endDate").value,
-      targetUrl: document.getElementById("targetUrl").value.trim(),
-      label: document.getElementById("adLabel").value,
-      billing: {
-        contactPerson: document.getElementById("contactPerson").value.trim(),
-        vatNumber: document.getElementById("vatNumber").value.trim(),
-        clientEmail: document.getElementById("clientEmail").value.trim(),
-        planTier: document.getElementById("planTier").value,
-        adminNotes: document.getElementById("adminNotes").value.trim()
+  function downloadMonthlyClicksPDF() {
+    if (!window.jspdf) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    const monthVal = document.getElementById("statsMonthPicker").value;
+    const clientFilter = document.getElementById("statsClientFilter").value;
+    const clientObj = clientFilter !== "ALL" ? db.clients.find(c => c.id === clientFilter) : null;
+    const subjectTitle = clientObj ? clientObj.name : "Riepilogo Generale Portale";
+    const totalClicksMonth = currentMonthlyRows.reduce((acc, r) => acc + r.clicks, 0);
+
+    // Header
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 210, 38, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(17);
+    doc.text("BRUNORACHIELE.IT • REPORT TRAFFICO & CLICK", 16, 16);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(203, 213, 225);
+    doc.text(`Inserzionista: ${subjectTitle}   |   Periodo di riferimento: ${monthVal}`, 16, 24);
+    doc.text(`Totale Click Certificati nel Mese: ${totalClicksMonth}`, 16, 31);
+
+    let y = 48;
+    doc.setFillColor(241, 245, 249);
+    doc.rect(16, y - 5, 178, 8, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text("DATA", 20, y);
+    doc.text("CLICK", 55, y);
+    doc.text("DETTAGLIO FORMATI CLICCATI", 82, y);
+    y += 7;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+
+    currentMonthlyRows.forEach((row) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
       }
-    };
-    buildSummaryPDF(tempObj);
+      const dateIt = row.date.split("-").reverse().join("/");
+      const detailTxt = row.details.length ? row.details.join(" | ") : "Nessun click registrato";
+      const wrapped = doc.splitTextToSize(detailTxt, 110);
+
+      doc.setTextColor(15, 23, 42);
+      doc.text(dateIt, 20, y);
+      doc.setFont("helvetica", row.clicks > 0 ? "bold" : "normal");
+      doc.text(String(row.clicks), 57, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(71, 85, 105);
+      doc.text(wrapped, 82, y);
+
+      const rowHeight = Math.max(6, wrapped.length * 4.5 + 1.5);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(16, y + rowHeight - 2, 194, y + rowHeight - 2);
+      y += rowHeight;
+    });
+
+    y += 6;
+    if (y > 272) { doc.addPage(); y = 20; }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(30, 58, 138);
+    doc.text(`TOTALE COMPLESSIVO MESE (${monthVal}): ${totalClicksMonth} CLICK`, 16, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text("Report generato da ads.brunorachiele.it • info@brunorachiele.it", 16, 285);
+
+    const safeName = subjectTitle.replace(/[^a-zA-Z0-9]/g, "_");
+    doc.save(`Report_Click_${safeName}_${monthVal}.pdf`);
   }
 
-  function renderTable() {
-    const tbody = document.getElementById("campaignsTable");
-    if (!currentConfig.campaigns || currentConfig.campaigns.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessuna campagna ancora inserita.</td></tr>';
-      return;
+  // ==================== RENDERING TABELLE E SELECT ====================
+  function renderAllUI() {
+    // Popola dropdown clienti in Gestione Pubblicità e in Statistiche
+    const bSelect = document.getElementById("bClientId");
+    const sSelect = document.getElementById("statsClientFilter");
+    const prevFilter = sSelect.value;
+
+    if (db.clients.length === 0) {
+      bSelect.innerHTML = '<option value="">-- Crea prima un cliente nella scheda Gestione Clienti --</option>';
+    } else {
+      bSelect.innerHTML = db.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
     }
 
-    tbody.innerHTML = currentConfig.campaigns.map(c => {
-      const planInfo = c.billing && c.billing.planTier ? c.billing.planTier : c.label;
-      return `
-      <tr>
-        <td><img src="${c.imageUrl}" class="thumb" alt="" /></td>
-        <td><strong>${c.client}</strong><br><small style="color:#64748b;">${planInfo}</small></td>
-        <td>${c.slots.join(", ")}</td>
-        <td>${c.startDate || "Sempre"} → ${c.endDate || "Illimitata"}</td>
-        <td><span class="badge ${c.active ? "badge-on" : "badge-off"}">${c.active ? "Attivo" : "In pausa"}</span></td>
-        <td>
-          <div class="actions-cell">
-            <button class="btn btn-pdf" onclick="downloadCampaignPDF('${c.id}')" title="Scarica Scheda PDF">PDF</button>
-            <button class="btn btn-secondary" onclick="editCampaign('${c.id}')">Modifica</button>
-            <button class="btn btn-secondary" onclick="toggleCampaign('${c.id}')">${c.active ? "Pausa" : "Attiva"}</button>
-            <button class="btn btn-danger" onclick="deleteCampaign('${c.id}')">Elimina</button>
-          </div>
-        </td>
-      </tr>
-    `}).join("");
+    sSelect.innerHTML = '<option value="ALL">Tutti i Clienti</option>' +
+      db.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    if (prevFilter) sSelect.value = prevFilter;
+
+    // Tabella Clienti
+    const cTbody = document.getElementById("clientsTable");
+    if (db.clients.length === 0) {
+      cTbody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessun cliente registrato. Compila il modulo qui sopra per iniziare.</td></tr>';
+    } else {
+      cTbody.innerHTML = db.clients.map(c => {
+        const countBanners = db.banners.filter(b => b.clientId === c.id).length;
+        return `
+          <tr>
+            <td><strong>${c.name}</strong><br><small style="color:#64748b;">${c.contactPerson || ""}</small></td>
+            <td>${c.email || "-"}<br><small style="color:#64748b;">${c.vatNumber || ""}</small></td>
+            <td>${c.planTier || "-"}</td>
+            <td><strong>${countBanners}</strong> banner</td>
+            <td><span class="badge ${c.active ? "badge-on" : "badge-off"}">${c.active ? "Attivo" : "Sospeso"}</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-pdf" onclick="downloadClientRegistryPDF('${c.id}')" title="Scarica PDF Anagrafica">PDF Anagrafica</button>
+                <button class="btn btn-secondary" onclick="editClient('${c.id}')">Modifica</button>
+                <button class="btn btn-secondary" onclick="toggleClient('${c.id}')">${c.active ? "Sospendi" : "Attiva"}</button>
+                <button class="btn btn-danger" onclick="deleteClient('${c.id}')">Elimina</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Tabella Banner
+    const bTbody = document.getElementById("bannersTable");
+    if (db.banners.length === 0) {
+      bTbody.innerHTML = '<tr><td colspan="7" style="color:#64748b;">Nessun banner inserito.</td></tr>';
+    } else {
+      bTbody.innerHTML = db.banners.map(b => {
+        const owner = db.clients.find(c => c.id === b.clientId);
+        const slotsTxt = (b.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
+        return `
+          <tr>
+            <td><img src="${b.imageUrl}" class="thumb" alt="" /></td>
+            <td><strong>${owner ? owner.name : "Cliente rimosso"}</strong><br><small style="color:#1e3a8a; font-weight:600;">${b.title}</small></td>
+            <td>${slotsTxt}</td>
+            <td>${b.startDate || "Sempre"} → ${b.endDate || "Illimitata"}</td>
+            <td id="b-clicks-${b.id}">0 click</td>
+            <td><span class="badge ${b.active ? "badge-on" : "badge-off"}">${b.active ? "Attivo" : "In pausa"}</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-secondary" onclick="editBanner('${b.id}')">Modifica</button>
+                <button class="btn btn-secondary" onclick="toggleBanner('${b.id}')">${b.active ? "Pausa" : "Attiva"}</button>
+                <button class="btn btn-danger" onclick="deleteBanner('${b.id}')">Elimina</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
   }
 
-  loadStoredCreds();
+  initLoginScreen();
 </script>
 </body>
 </html>
