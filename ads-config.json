@@ -15,5 +15,21 @@
       "active": true
     }
   ],
-  "banners": []
+  "banners": [
+    {
+      "id": "ad_1795563666651",
+      "clientId": "cli-1795563309550",
+      "title": "Home Page",
+      "slots": [
+        "header-top"
+      ],
+      "weight": 1,
+      "startDate": "2026-11-24",
+      "endDate": "2026-12-31",
+      "imageUrl": "https://ads.brunorachiele.it/banners/1795563664743-ACQUISTA_IL_TUO_SPAZIO_PUBBLICITARIO.jpg",
+      "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
+      "label": "Spazio Sponsorizzato",
+      "active": true
+    }
+  ]
 }
