@@ -72,8 +72,7 @@
     return list[0];
   }
 
-  // Registra il click giornaliero sul contatore serverless + Google Analytics 4
-  function recordClick(banner, clientName, slotName) {
+  function recordClick(banner, slotName) {
     const today = new Date().toISOString().slice(0, 10);
     const safeId = String(banner.id).replace(/[^a-zA-Z0-9_-]/g, "_");
     const dailyKey = `${safeId}_${today}`;
@@ -88,16 +87,16 @@
     if (typeof window.gtag === "function") {
       window.gtag("event", "ad_click", {
         event_category: "Advertising_B2B",
-        event_label: `${clientName} - ${banner.title || banner.id}`,
+        event_label: `${banner.clientName || "Partner"} - ${banner.title || banner.id}`,
         ad_slot: slotName
       });
     }
   }
 
-  function renderSlot(slotEl, banner, clientObj, slotName) {
+  function renderSlot(slotEl, banner, slotName) {
     if (!banner.imageUrl) return;
-    const clientName = clientObj ? clientObj.name : (banner.client || "Partner");
-    const labelText = banner.label || (clientObj && clientObj.defaultLabel) || "Spazio Sponsorizzato";
+    const clientName = banner.clientName || "Partner";
+    const labelText = banner.label || "Spazio Sponsorizzato";
 
     const wrapper = document.createElement("div");
     wrapper.className = "br-ad-wrapper";
@@ -120,7 +119,7 @@
     img.loading = "lazy";
 
     link.addEventListener("click", function () {
-      recordClick(banner, clientName, slotName);
+      recordClick(banner, slotName);
     });
 
     link.appendChild(img);
@@ -143,22 +142,14 @@
       if (!response.ok) return;
 
       const data = await response.json();
-      const clients = Array.isArray(data.clients) ? data.clients : [];
-      // Supporta sia il nuovo array "banners" sia eventuali vecchie voci "campaigns"
-      const banners = Array.isArray(data.banners)
-        ? data.banners
-        : (Array.isArray(data.campaigns) ? data.campaigns : []);
-
-      const clientMap = {};
-      clients.forEach(c => { clientMap[c.id] = c; });
+      const banners = Array.isArray(data.banners) ? data.banners : [];
 
       slotElements.forEach(function (el) {
         const slotName = el.getAttribute("data-slot");
         const eligible = banners.filter(function (b) {
-          const owner = b.clientId ? clientMap[b.clientId] : null;
-          if (owner && owner.active === false) return false;
           return (
             b.active === true &&
+            b.clientActive !== false &&
             Array.isArray(b.slots) &&
             b.slots.includes(slotName) &&
             isDateValid(b.startDate, b.endDate)
@@ -167,12 +158,11 @@
 
         const chosen = pickWeightedBanner(eligible);
         if (chosen) {
-          const owner = chosen.clientId ? clientMap[chosen.clientId] : null;
-          renderSlot(el, chosen, owner, slotName);
+          renderSlot(el, chosen, slotName);
         }
       });
     } catch (err) {
-      console.warn("BR Ads Engine:", err);
+      console.warn("brunorachiele.it ads engine:", err);
     }
   }
 
