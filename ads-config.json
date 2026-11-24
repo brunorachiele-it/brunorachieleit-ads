@@ -1,22 +1,5 @@
 {
   "version": "1.0",
   "updatedAt": "2026-11-24",
-  "campaigns": [
-    {
-      "id": "ad-1795557461371",
-      "client": "brunorachiele.it",
-      "active": true,
-      "slots": [
-        "header-top",
-        "sidebar-rassegna"
-      ],
-      "weight": 1,
-      "startDate": "2026-11-24",
-      "endDate": "2026-12-24",
-      "imageUrl": "https://ads.brunorachiele.it/banners/1795557298767-logoorizzontalebianco.png",
-      "targetUrl": "https://www.brunorachiele.it/p/prime-pagine-dei-giornali.html#google_vignette",
-      "altText": "brunorachiele.it",
-      "label": "Spazio Disponibile"
-    }
-  ]
+  "campaigns": []
 }
