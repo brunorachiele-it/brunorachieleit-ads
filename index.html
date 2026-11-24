@@ -52,8 +52,7 @@
       color: var(--primary);
       font-size: 11px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       padding: 4px 10px;
       border-radius: 999px;
       margin-bottom: 10px;
@@ -321,6 +320,15 @@
       height: 100%;
       border-radius: 999px;
     }
+    .storage-note {
+      font-size: 12px;
+      color: var(--muted);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
   </style>
 </head>
 <body>
@@ -330,7 +338,7 @@
   <div class="login-box">
     <span class="login-badge">Area Riservata • brunorachiele.it</span>
     <h1>Accesso Ad Manager</h1>
-    <p>Inserisci le credenziali del repository GitHub per gestire clienti, banner multi-formato e reportistica click.</p>
+    <p>Inserisci le credenziali del repository GitHub per gestire clienti (<code>clients/</code>), banner e archivio storico mensile (<code>stats/</code>).</p>
 
     <div id="loginError" class="status-bar err"></div>
 
@@ -355,14 +363,14 @@
       <span class="topbar-pill" id="repoBadge">brunorachiele-it/brunorachieleit-ads</span>
     </div>
     <div style="display:flex; gap:8px; align-items:center;">
-      <button class="btn btn-outline" onclick="refreshAllStats()">Aggiorna Click Live</button>
+      <button class="btn btn-outline" onclick="syncAndArchiveCurrentMonth()">Sincronizza e Archivia Click</button>
       <button class="btn btn-outline" onclick="logout()">Esci</button>
     </div>
   </div>
 
   <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="tab-overview" onclick="switchTab('tab-overview', this)">Panoramica &amp; Statistiche Click</button>
-    <button class="nav-tab" data-tab="tab-clients" onclick="switchTab('tab-clients', this)">Gestione Clienti (Anagrafiche)</button>
+    <button class="nav-tab active" data-tab="tab-overview" onclick="switchTab('tab-overview', this)">Panoramica &amp; Storico Click</button>
+    <button class="nav-tab" data-tab="tab-clients" onclick="switchTab('tab-clients', this)">Gestione Clienti (clients/)</button>
     <button class="nav-tab" data-tab="tab-banners" onclick="switchTab('tab-banners', this)">Gestione Pubblicità (Banner)</button>
   </div>
 
@@ -373,9 +381,9 @@
     <div id="tab-overview" class="tab-panel active">
       <div class="kpi-grid">
         <div class="kpi-card">
-          <span class="kpi-label">Click Totali Generati</span>
+          <span class="kpi-label">Click Totali Storici</span>
           <span class="kpi-value" id="kpiTotalClicks">0</span>
-          <div class="kpi-sub">Su tutti i banner attivi e passati</div>
+          <div class="kpi-sub">Somma di tutti i mesi archiviati</div>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">Click nel Mese Selezionato</span>
@@ -383,29 +391,33 @@
           <div class="kpi-sub" id="kpiMonthLabel">Mese corrente</div>
         </div>
         <div class="kpi-card">
-          <span class="kpi-label">Clienti Attivi</span>
+          <span class="kpi-label">Clienti Registrati</span>
           <span class="kpi-value" id="kpiActiveClients">0</span>
-          <div class="kpi-sub">Inserzionisti in anagrafica</div>
+          <div class="kpi-sub">Salvati in <code>clients/clients.json</code></div>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">Banner Pubblicati</span>
           <span class="kpi-value" id="kpiActiveBanners">0</span>
-          <div class="kpi-sub">Formati attivi nei vari slot</div>
+          <div class="kpi-sub">Formati attivi sul portale</div>
         </div>
       </div>
 
       <!-- FILTRO MENSILE E REPORT PDF GIORNO PER GIORNO -->
       <div class="card">
         <h2>
-          <span>Riepilogo Click Giorno per Giorno (Diviso per Mese)</span>
+          <span>Riepilogo Click Giorno per Giorno (Archivio <code>stats/AAAA-MM.json</code>)</span>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <select id="statsClientFilter" style="width:auto; margin:0;" onchange="loadMonthlyClickBreakdown()">
+            <select id="statsClientFilter" style="width:auto; margin:0;" onchange="renderMonthFromArchiveOrLive()">
               <option value="ALL">Tutti i Clienti</option>
             </select>
-            <input type="month" id="statsMonthPicker" style="width:auto; margin:0;" onchange="loadMonthlyClickBreakdown()" />
+            <input type="month" id="statsMonthPicker" style="width:auto; margin:0;" onchange="loadMonthStats()" />
             <button class="btn btn-pdf" style="padding:8px 14px; font-size:13px;" onclick="downloadMonthlyClicksPDF()">Scarica PDF Report Click Mese</button>
           </div>
         </h2>
+
+        <div class="storage-note" id="archiveStatusNote">
+          I dati mensili vengono salvati nella cartella <strong>stats/</strong> su GitHub: puoi selezionare qualsiasi mese passato e scaricare il PDF riepilogativo per il cliente.
+        </div>
 
         <div style="overflow-x:auto;">
           <table>
@@ -418,7 +430,7 @@
               </tr>
             </thead>
             <tbody id="dailyClicksTable">
-              <tr><td colspan="4" style="color:#64748b;">Caricamento statistiche giornaliere...</td></tr>
+              <tr><td colspan="4" style="color:#64748b;">Caricamento statistiche...</td></tr>
             </tbody>
           </table>
         </div>
@@ -426,7 +438,7 @@
 
       <!-- CLASSIFICA CLICK PER CLIENTE E BANNER -->
       <div class="card">
-        <h2>Riepilogo Click Totali per Cliente e Singolo Banner</h2>
+        <h2>Riepilogo Click del Mese per Cliente e Singolo Banner</h2>
         <div style="overflow-x:auto;">
           <table>
             <thead>
@@ -434,13 +446,12 @@
                 <th>Cliente</th>
                 <th>Banner / Formato</th>
                 <th>Posizione (Slot)</th>
-                <th>Click Mese</th>
-                <th>Click Totali</th>
-                <th>Report PDF</th>
+                <th>Click Mese Selezionato</th>
+                <th>Report PDF Cliente</th>
               </tr>
             </thead>
             <tbody id="bannerStatsTable">
-              <tr><td colspan="6" style="color:#64748b;">Nessun dato disponibile.</td></tr>
+              <tr><td colspan="5" style="color:#64748b;">Nessun dato disponibile.</td></tr>
             </tbody>
           </table>
         </div>
@@ -451,6 +462,9 @@
     <div id="tab-clients" class="tab-panel">
       <div class="card">
         <h2 id="clientFormTitle">Nuova Anagrafica Cliente / Inserzionista</h2>
+        <div class="storage-note">
+          Le anagrafiche sono salvate separatamente nel file <strong>clients/clients.json</strong>: anche aggiornando <code>index.html</code> i tuoi clienti restano al sicuro.
+        </div>
         <input type="hidden" id="editClientId" value="" />
         <div class="grid-3">
           <div>
@@ -504,7 +518,7 @@
           </div>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-success" onclick="saveClient()">Salva Anagrafica Cliente</button>
+          <button class="btn btn-success" onclick="saveClient()">Salva Anagrafica in clients/</button>
           <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetClientForm()">Pulisci Campi</button>
         </div>
       </div>
@@ -518,7 +532,7 @@
                 <th>Cliente / Azienda</th>
                 <th>Contatti &amp; P.IVA</th>
                 <th>Pacchetto</th>
-                <th>Banner Attivi</th>
+                <th>Banner Associati</th>
                 <th>Stato</th>
                 <th>Azioni &amp; PDF Anagrafica</th>
               </tr>
@@ -542,8 +556,8 @@
             <label>Seleziona Cliente *</label>
             <select id="bClientId"></select>
 
-            <label>Nome / Formato del Banner (per riconoscerlo nei report) *</label>
-            <input type="text" id="bTitle" placeholder="es. Banner Orizzontale Header oppure Banner Quadrato Sidebar" />
+            <label>Nome / Formato del Banner (es. Orizzontale Header o Piccolo Sidebar) *</label>
+            <input type="text" id="bTitle" placeholder="es. Banner Orizzontale Header oppure Banner Piccolo Sidebar" />
 
             <label>Link di Destinazione (URL cliccabile) *</label>
             <input type="url" id="bTargetUrl" placeholder="https://www.sito-cliente.it" />
@@ -604,7 +618,7 @@
                 <th>Cliente &amp; Formato</th>
                 <th>Slot Assegnati</th>
                 <th>Validità</th>
-                <th>Click Totali</th>
+                <th>Click Mese</th>
                 <th>Stato</th>
                 <th>Azioni</th>
               </tr>
@@ -623,12 +637,19 @@
 <script>
   const COUNTER_NAMESPACE = "brunorachiele_ads_v2";
   let creds = null;
-  let configSha = null;
-  let db = { version: "2.0", updatedAt: "", clients: [], banners: [] };
 
-  // Cache dei click letti dal server: { bannerId: { total: N, byDate: { "2026-11-25": X } } }
-  let liveClickStats = {};
+  // SHA dei file su GitHub per aggiornamenti atomici
+  let clientsSha = null;
+  let adsConfigSha = null;
+  let currentStatsSha = null;
+
+  // Dati caricati in memoria
+  let clientsList = [];
+  let bannersList = [];
+  // Struttura archivio mensile corrente: { month: "2026-11", updatedAt: "...", days: { "2026-11-25": { "ad_123": 4 } } }
+  let activeMonthArchive = { month: "", updatedAt: "", days: {} };
   let currentMonthlyRows = [];
+  let historicalGrandTotal = 0;
 
   const SLOT_LABELS = {
     "header-top": "Testata Alta (Header Top)",
@@ -650,7 +671,57 @@
     if (btnEl) btnEl.classList.add("active");
   }
 
-  // ==================== AUTENTICAZIONE ====================
+  // ==================== HELPER API GITHUB (LETTURA / SCRITTURA CARTELLE) ====================
+  async function ghGetFile(path) {
+    const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`;
+    const res = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${creds.token}`,
+        "Accept": "application/vnd.github+json"
+      }
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`Errore lettura file ${path} su GitHub.`);
+    const data = await res.json();
+    const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
+    return { sha: data.sha, json: JSON.parse(decoded) };
+  }
+
+  async function ghPutFile(path, jsonObj, sha, commitMsg) {
+    const jsonString = JSON.stringify(jsonObj, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+    const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`;
+    const body = { message: commitMsg, content: encoded };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${creds.token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`Errore salvataggio file ${path} su GitHub.`);
+    const result = await res.json();
+    return result.content.sha;
+  }
+
+  async function ghListFolder(folderPath) {
+    const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${folderPath}`;
+    const res = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${creds.token}`,
+        "Accept": "application/vnd.github+json"
+      }
+    });
+    if (!res.ok) return [];
+    const items = await res.json();
+    return Array.isArray(items) ? items : [];
+  }
+
+  // ==================== AUTENTICAZIONE E CARICAMENTO INIZIALE ====================
   function initLoginScreen() {
     document.getElementById("loginOwner").value = localStorage.getItem("br_ads_owner") || "brunorachiele-it";
     document.getElementById("loginRepo").value = localStorage.getItem("br_ads_repo") || "brunorachieleit-ads";
@@ -675,61 +746,32 @@
     }
 
     errBox.style.display = "none";
+    creds = { owner, repo, token };
 
     try {
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/ads-config.json`;
-      const res = await fetch(url, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/vnd.github+json"
-        }
-      });
+      // 1. Legge ads-config.json
+      const configRes = await ghGetFile("ads-config.json");
+      if (!configRes) {
+        throw new Error("Impossibile trovare ads-config.json nel repository.");
+      }
+      adsConfigSha = configRes.sha;
+      bannersList = Array.isArray(configRes.json.banners) ? configRes.json.banners : [];
 
-      if (!res.ok) {
-        throw new Error("Accesso negato: verifica Proprietario, Nome Repository e permessi del Token.");
+      // 2. Legge clients/clients.json (se non esiste ancora, lo crea automaticamente)
+      const clientsRes = await ghGetFile("clients/clients.json");
+      if (clientsRes) {
+        clientsSha = clientsRes.sha;
+        clientsList = Array.isArray(clientsRes.json.clients) ? clientsRes.json.clients : [];
+      } else {
+        clientsList = [];
+        clientsSha = await ghPutFile(
+          "clients/clients.json",
+          { updatedAt: new Date().toISOString().slice(0, 10), clients: [] },
+          null,
+          "Inizializzazione cartella clients/"
+        );
       }
 
-      const data = await res.json();
-      configSha = data.sha;
-      const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
-      const parsed = JSON.parse(decoded);
-
-      // Migrazione automatica se esistevano vecchie "campaigns"
-      db.clients = Array.isArray(parsed.clients) ? parsed.clients : [];
-      db.banners = Array.isArray(parsed.banners) ? parsed.banners : [];
-
-      if (Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0 && db.banners.length === 0) {
-        parsed.campaigns.forEach(old => {
-          const cid = "cli-" + old.id;
-          db.clients.push({
-            id: cid,
-            name: old.client,
-            contactPerson: (old.billing && old.billing.contactPerson) || "",
-            vatNumber: (old.billing && old.billing.vatNumber) || "",
-            email: (old.billing && old.billing.clientEmail) || "",
-            phone: "",
-            planTier: (old.billing && old.billing.planTier) || "START Mensile (25,00 € / mese)",
-            defaultLabel: old.label || "Spazio Sponsorizzato",
-            notes: (old.billing && old.billing.adminNotes) || "",
-            active: old.active !== false
-          });
-          db.banners.push({
-            id: old.id,
-            clientId: cid,
-            title: "Banner Principale",
-            slots: old.slots || ["sidebar-rassegna"],
-            weight: old.weight || 1,
-            startDate: old.startDate || "",
-            endDate: old.endDate || "",
-            imageUrl: old.imageUrl || "",
-            targetUrl: old.targetUrl || "",
-            label: old.label || "Spazio Sponsorizzato",
-            active: old.active !== false
-          });
-        });
-      }
-
-      creds = { owner, repo, token };
       localStorage.setItem("br_ads_owner", owner);
       localStorage.setItem("br_ads_repo", repo);
       localStorage.setItem("br_ads_token", token);
@@ -743,8 +785,9 @@
       document.getElementById("statsMonthPicker").value = today.slice(0, 7);
 
       renderAllUI();
-      await refreshAllStats();
+      await loadMonthStats(true);
     } catch (e) {
+      creds = null;
       if (!isAuto) {
         errBox.textContent = e.message;
         errBox.style.display = "block";
@@ -757,33 +800,36 @@
     location.reload();
   }
 
-  // ==================== SALVATAGGIO SU GITHUB ====================
-  async function syncDatabaseToGitHub(commitMsg) {
-    db.updatedAt = new Date().toISOString().slice(0, 10);
-    const jsonString = JSON.stringify(db, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
-
-    const apiUrl = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
-    const res = await fetch(apiUrl, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${creds.token}`,
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: commitMsg || "Aggiornamento Ad Server & CRM",
-        content: encoded,
-        sha: configSha
-      })
-    });
-
-    if (!res.ok) throw new Error("Errore durante il salvataggio su GitHub.");
-    const updated = await res.json();
-    configSha = updated.content.sha;
+  // ==================== SALVATAGGIO CLIENTI (clients/clients.json) ====================
+  async function saveClientsToGitHub(msg) {
+    clientsSha = await ghPutFile(
+      "clients/clients.json",
+      { updatedAt: new Date().toISOString().slice(0, 10), clients: clientsList },
+      clientsSha,
+      msg || "Aggiornamento anagrafiche clients/"
+    );
   }
 
-  // ==================== GESTIONE CLIENTI ====================
+  async function saveBannersToGitHub(msg) {
+    // Incorpora clientName e clientActive direttamente in ogni banner così ads-engine.js resta leggero e indipendente
+    const enrichedBanners = bannersList.map(b => {
+      const owner = clientsList.find(c => c.id === b.clientId);
+      return {
+        ...b,
+        clientName: owner ? owner.name : (b.clientName || "Partner"),
+        clientActive: owner ? owner.active !== false : true,
+        label: owner ? owner.defaultLabel : (b.label || "Spazio Sponsorizzato")
+      };
+    });
+
+    adsConfigSha = await ghPutFile(
+      "ads-config.json",
+      { version: "2.1", updatedAt: new Date().toISOString().slice(0, 10), banners: enrichedBanners },
+      adsConfigSha,
+      msg || "Aggiornamento ads-config.json"
+    );
+  }
+
   async function saveClient() {
     const name = document.getElementById("cName").value.trim();
     if (!name) {
@@ -806,27 +852,28 @@
     };
 
     try {
-      showStatus("Salvataggio anagrafica cliente...", "info");
+      showStatus("Salvataggio anagrafica in clients/clients.json...", "info");
       if (editId) {
-        const idx = db.clients.findIndex(c => c.id === editId);
+        const idx = clientsList.findIndex(c => c.id === editId);
         if (idx !== -1) {
-          clientObj.active = db.clients[idx].active;
-          db.clients[idx] = clientObj;
+          clientObj.active = clientsList[idx].active;
+          clientsList[idx] = clientObj;
         }
       } else {
-        db.clients.push(clientObj);
+        clientsList.push(clientObj);
       }
-      await syncDatabaseToGitHub(`Anagrafica cliente: ${name}`);
+      await saveClientsToGitHub(`Cliente: ${name}`);
+      await saveBannersToGitHub(`Sincronizzazione banner per cliente: ${name}`);
       resetClientForm();
       renderAllUI();
-      showStatus("Anagrafica cliente salvata con successo!", "ok");
+      showStatus("Cliente salvato nella cartella clients/ con successo!", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
   function editClient(id) {
-    const c = db.clients.find(item => item.id === id);
+    const c = clientsList.find(item => item.id === id);
     if (!c) return;
     document.getElementById("clientFormTitle").textContent = "Modifica Cliente: " + c.name;
     document.getElementById("editClientId").value = c.id;
@@ -842,12 +889,13 @@
   }
 
   async function toggleClient(id) {
-    const c = db.clients.find(item => item.id === id);
+    const c = clientsList.find(item => item.id === id);
     if (!c) return;
     c.active = !c.active;
     try {
       showStatus("Aggiornamento stato cliente...", "info");
-      await syncDatabaseToGitHub(`Stato cliente ${c.name}: ${c.active}`);
+      await saveClientsToGitHub(`Stato cliente ${c.name}: ${c.active}`);
+      await saveBannersToGitHub(`Stato banner cliente ${c.name}`);
       renderAllUI();
       showStatus("Stato cliente aggiornato.", "ok");
     } catch (e) {
@@ -856,12 +904,13 @@
   }
 
   async function deleteClient(id) {
-    if (!confirm("Eliminare questo cliente? Verranno scollegati anche i suoi banner.")) return;
-    db.clients = db.clients.filter(c => c.id !== id);
-    db.banners = db.banners.filter(b => b.clientId !== id);
+    if (!confirm("Eliminare questo cliente da clients/clients.json? Verranno rimossi anche i suoi banner.")) return;
+    clientsList = clientsList.filter(c => c.id !== id);
+    bannersList = bannersList.filter(b => b.clientId !== id);
     try {
       showStatus("Eliminazione cliente...", "info");
-      await syncDatabaseToGitHub("Eliminazione cliente e relativi banner");
+      await saveClientsToGitHub("Eliminazione cliente");
+      await saveBannersToGitHub("Rimozione banner cliente eliminato");
       renderAllUI();
       showStatus("Cliente eliminato.", "ok");
     } catch (e) {
@@ -927,7 +976,7 @@
             })
           });
 
-          if (!res.ok) throw new Error("Errore durante il caricamento dell'immagine su GitHub.");
+          if (!res.ok) throw new Error("Errore durante il caricamento dell'immagine in banners/.");
           resolve(`https://ads.brunorachiele.it/${path}`);
         } catch (err) {
           reject(err);
@@ -962,8 +1011,6 @@
       return;
     }
 
-    const owner = db.clients.find(c => c.id === clientId);
-
     try {
       showStatus("Pubblicazione banner in corso...", "info");
       if (file) {
@@ -980,31 +1027,30 @@
         endDate,
         imageUrl,
         targetUrl,
-        label: owner ? owner.defaultLabel : "Spazio Sponsorizzato",
         active: true
       };
 
       if (editId) {
-        const idx = db.banners.findIndex(b => b.id === editId);
+        const idx = bannersList.findIndex(b => b.id === editId);
         if (idx !== -1) {
-          bannerObj.active = db.banners[idx].active;
-          db.banners[idx] = bannerObj;
+          bannerObj.active = bannersList[idx].active;
+          bannersList[idx] = bannerObj;
         }
       } else {
-        db.banners.push(bannerObj);
+        bannersList.push(bannerObj);
       }
 
-      await syncDatabaseToGitHub(`Pubblicazione banner: ${title}`);
+      await saveBannersToGitHub(`Banner: ${title}`);
       resetBannerForm();
       renderAllUI();
-      showStatus("Banner pubblicato! Sarà visibile sul sito entro 1-2 minuti.", "ok");
+      showStatus("Banner pubblicato! Sarà visibile su brunorachiele.it entro 1-2 minuti.", "ok");
     } catch (e) {
       showStatus(e.message, "err");
     }
   }
 
   function editBanner(id) {
-    const b = db.banners.find(item => item.id === id);
+    const b = bannersList.find(item => item.id === id);
     if (!b) return;
     document.getElementById("bannerFormTitle").textContent = "Modifica Banner: " + b.title;
     document.getElementById("editBannerId").value = b.id;
@@ -1023,12 +1069,12 @@
   }
 
   async function toggleBanner(id) {
-    const b = db.banners.find(item => item.id === id);
+    const b = bannersList.find(item => item.id === id);
     if (!b) return;
     b.active = !b.active;
     try {
       showStatus("Aggiornamento stato banner...", "info");
-      await syncDatabaseToGitHub(`Stato banner ${b.title}: ${b.active}`);
+      await saveBannersToGitHub(`Stato banner ${b.title}: ${b.active}`);
       renderAllUI();
       showStatus("Stato banner aggiornato.", "ok");
     } catch (e) {
@@ -1038,10 +1084,10 @@
 
   async function deleteBanner(id) {
     if (!confirm("Vuoi eliminare definitivamente questo banner?")) return;
-    db.banners = db.banners.filter(b => b.id !== id);
+    bannersList = bannersList.filter(b => b.id !== id);
     try {
       showStatus("Eliminazione banner...", "info");
-      await syncDatabaseToGitHub("Eliminazione banner");
+      await saveBannersToGitHub("Eliminazione banner");
       renderAllUI();
       showStatus("Banner eliminato.", "ok");
     } catch (e) {
@@ -1062,7 +1108,7 @@
     document.getElementById("bPrevPlaceholder").style.display = "block";
   }
 
-  // ==================== STATISTICHE CLICK LIVE & MENSILI ====================
+  // ==================== STATISTICHE MENSILI & ARCHIVIO IN stats/ ====================
   async function fetchSingleCounter(key) {
     try {
       const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${key}`);
@@ -1079,100 +1125,177 @@
     const daysCount = new Date(y, m, 0).getDate();
     const list = [];
     for (let d = 1; d <= daysCount; d++) {
-      const dayStr = String(d).padStart(2, "0");
-      list.push(`${yearMonth}-${dayStr}`);
+      list.push(`${yearMonth}-${String(d).padStart(2, "0")}`);
     }
     return list;
   }
 
-  async function refreshAllStats() {
-    await loadMonthlyClickBreakdown();
+  // Calcola il totale storico sommando tutti i file JSON salvati nella cartella stats/
+  async function computeGrandTotalFromArchive() {
+    const files = await ghListFolder("stats");
+    let grandTotal = 0;
+    for (const f of files) {
+      if (f.name && f.name.endsWith(".json")) {
+        const res = await ghGetFile(`stats/${f.name}`);
+        if (res && res.json && res.json.days) {
+          Object.values(res.json.days).forEach(dayMap => {
+            Object.values(dayMap).forEach(val => { grandTotal += Number(val) || 0; });
+          });
+        }
+      }
+    }
+    historicalGrandTotal = grandTotal;
+    document.getElementById("kpiTotalClicks").textContent = historicalGrandTotal;
   }
 
-  async function loadMonthlyClickBreakdown() {
+  // Carica un mese (legge prima l'archivio stats/AAAA-MM.json e lo aggiorna con eventuali nuovi click live)
+  async function loadMonthStats(shouldSaveToGitHub = false) {
     const monthVal = document.getElementById("statsMonthPicker").value || new Date().toISOString().slice(0, 7);
+    const tbody = document.getElementById("dailyClicksTable");
+    const noteEl = document.getElementById("archiveStatusNote");
+
+    document.getElementById("kpiMonthLabel").textContent = "Mese: " + monthVal;
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Lettura archivio mensile e contatori live...</td></tr>';
+
+    const archivePath = `stats/${monthVal}.json`;
+    const existing = await ghGetFile(archivePath);
+    currentStatsSha = existing ? existing.sha : null;
+    const savedDays = (existing && existing.json && existing.json.days) ? existing.json.days : {};
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const currentMonthStr = todayStr.slice(0, 7);
+    const days = getDaysInMonth(monthVal).filter(d => d <= todayStr);
+
+    const mergedDays = JSON.parse(JSON.stringify(savedDays));
+    let hasChanges = false;
+
+    // Se il mese selezionato è quello corrente (o non era ancora archiviato), interroga i contatori live
+    if (monthVal === currentMonthStr || !existing) {
+      for (const day of days) {
+        if (!mergedDays[day]) mergedDays[day] = {};
+        await Promise.all(bannersList.map(async (b) => {
+          const safeId = String(b.id).replace(/[^a-zA-Z0-9_-]/g, "_");
+          const liveVal = await fetchSingleCounter(`${safeId}_${day}`);
+          const prevVal = Number(mergedDays[day][b.id]) || 0;
+          if (liveVal > prevVal) {
+            mergedDays[day][b.id] = liveVal;
+            hasChanges = true;
+          }
+        }));
+      }
+    }
+
+    activeMonthArchive = {
+      month: monthVal,
+      updatedAt: todayStr,
+      days: mergedDays
+    };
+
+    if ((shouldSaveToGitHub || hasChanges) && days.length > 0) {
+      try {
+        currentStatsSha = await ghPutFile(
+          archivePath,
+          activeMonthArchive,
+          currentStatsSha,
+          `Archivio click mensile ${monthVal}`
+        );
+        noteEl.innerHTML = `Archivio <strong>${archivePath}</strong> sincronizzato e salvato su GitHub.`;
+      } catch (e) {
+        console.warn("Salvataggio stats rimandato:", e);
+      }
+    } else if (existing) {
+      noteEl.innerHTML = `Dati caricati dall'archivio storico <strong>${archivePath}</strong> (aggiornato al ${existing.json.updatedAt || monthVal}).`;
+    }
+
+    renderMonthFromArchiveOrLive();
+    await computeGrandTotalFromArchive();
+  }
+
+  async function syncAndArchiveCurrentMonth() {
+    showStatus("Sincronizzazione click live e salvataggio nella cartella stats/ su GitHub...", "info");
+    await loadMonthStats(true);
+    showStatus("Statistiche mensili archiviate con successo in stats/!", "ok");
+  }
+
+  function renderMonthFromArchiveOrLive() {
+    const monthVal = activeMonthArchive.month;
     const clientFilter = document.getElementById("statsClientFilter").value || "ALL";
     const tbody = document.getElementById("dailyClicksTable");
 
-    document.getElementById("kpiMonthLabel").textContent = "Mese: " + monthVal;
-    tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Lettura contatori giornalieri in corso...</td></tr>';
+    const targetBanners = bannersList.filter(b => clientFilter === "ALL" || b.clientId === clientFilter);
+    const targetBannerIds = new Set(targetBanners.map(b => b.id));
 
-    const targetBanners = db.banners.filter(b => clientFilter === "ALL" || b.clientId === clientFilter);
-    const days = getDaysInMonth(monthVal);
     const todayStr = new Date().toISOString().slice(0, 10);
-
-    // Filtra fino a oggi se il mese è quello corrente (evita richieste inutili ai giorni futuri)
-    const validDays = days.filter(d => d <= todayStr);
+    const days = getDaysInMonth(monthVal).filter(d => d <= todayStr);
 
     let monthTotal = 0;
     const bannerMonthTotals = {};
     targetBanners.forEach(b => { bannerMonthTotals[b.id] = 0; });
 
-    const dailyResults = [];
+    const rows = [];
 
-    for (const day of validDays) {
+    days.forEach(day => {
+      const dayRecord = activeMonthArchive.days[day] || {};
       let daySum = 0;
       const details = [];
 
-      await Promise.all(targetBanners.map(async (b) => {
-        const safeId = String(b.id).replace(/[^a-zA-Z0-9_-]/g, "_");
-        const count = await fetchSingleCounter(`${safeId}_${day}`);
-        if (count > 0) {
+      Object.entries(dayRecord).forEach(([bId, countVal]) => {
+        const count = Number(countVal) || 0;
+        if (count > 0 && (clientFilter === "ALL" || targetBannerIds.has(bId))) {
           daySum += count;
-          bannerMonthTotals[b.id] = (bannerMonthTotals[b.id] || 0) + count;
-          const owner = db.clients.find(c => c.id === b.clientId);
-          details.push(`${owner ? owner.name : "Partner"} (${b.title}): ${count}`);
+          bannerMonthTotals[bId] = (bannerMonthTotals[bId] || 0) + count;
+          const bObj = bannersList.find(x => x.id === bId);
+          const owner = bObj ? clientsList.find(c => c.id === bObj.clientId) : null;
+          const labelName = owner ? owner.name : (bObj ? bObj.clientName : "Partner");
+          const formatName = bObj ? bObj.title : bId;
+          details.push(`${labelName} (${formatName}): ${count}`);
         }
-      }));
+      });
 
       monthTotal += daySum;
-      dailyResults.push({ date: day, clicks: daySum, details });
-    }
+      rows.push({ date: day, clicks: daySum, details });
+    });
 
-    currentMonthlyRows = dailyResults;
+    currentMonthlyRows = rows;
 
     // Aggiorna KPI
     document.getElementById("kpiMonthClicks").textContent = monthTotal;
-    document.getElementById("kpiTotalClicks").textContent = monthTotal;
-    document.getElementById("kpiActiveClients").textContent = db.clients.filter(c => c.active).length;
-    document.getElementById("kpiActiveBanners").textContent = db.banners.filter(b => b.active).length;
+    document.getElementById("kpiActiveClients").textContent = clientsList.filter(c => c.active).length;
+    document.getElementById("kpiActiveBanners").textContent = bannersList.filter(b => b.active).length;
 
-    // Render Tabella Giorno per Giorno
-    const maxDay = Math.max(1, ...dailyResults.map(r => r.clicks));
-    if (dailyResults.length === 0) {
+    // Tabella Giorno per Giorno
+    const maxDay = Math.max(1, ...rows.map(r => r.clicks));
+    if (rows.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Nessun giorno trascorso nel mese selezionato.</td></tr>';
     } else {
-      tbody.innerHTML = dailyResults.map(r => {
+      tbody.innerHTML = rows.map(r => {
         const pct = Math.round((r.clicks / maxDay) * 100);
         const formattedDate = r.date.split("-").reverse().join("/");
         return `
           <tr>
             <td><strong>${formattedDate}</strong></td>
             <td><span class="badge ${r.clicks > 0 ? "badge-on" : "badge-off"}">${r.clicks} click</span></td>
-            <td>
-              <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-            </td>
+            <td><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div></td>
             <td style="font-size:12.5px; color:#475569;">${r.details.length ? r.details.join(" • ") : "-"}</td>
           </tr>
         `;
       }).join("");
     }
 
-    // Render Tabella Riepilogo per Banner
+    // Tabella Riepilogo per Banner
     const bStatsBody = document.getElementById("bannerStatsTable");
     if (targetBanners.length === 0) {
-      bStatsBody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessun banner associato.</td></tr>';
+      bStatsBody.innerHTML = '<tr><td colspan="5" style="color:#64748b;">Nessun banner associato.</td></tr>';
     } else {
       bStatsBody.innerHTML = targetBanners.map(b => {
-        const owner = db.clients.find(c => c.id === b.clientId);
+        const owner = clientsList.find(c => c.id === b.clientId);
         const cClicks = bannerMonthTotals[b.id] || 0;
         const slotsTxt = (b.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
         return `
           <tr>
-            <td><strong>${owner ? owner.name : "N/D"}</strong></td>
+            <td><strong>${owner ? owner.name : (b.clientName || "N/D")}</strong></td>
             <td>${b.title}</td>
             <td>${slotsTxt}</td>
-            <td><strong>${cClicks}</strong></td>
             <td><strong>${cClicks}</strong></td>
             <td>
               <button class="btn btn-pdf" onclick="downloadClientMonthlyPDF('${b.clientId}')">PDF Report Mese</button>
@@ -1182,32 +1305,35 @@
       }).join("");
     }
 
-    // Aggiorna anche la colonna click nella tabella Gestione Pubblicità
-    db.banners.forEach(b => {
+    // Aggiorna contatore nella tabella Gestione Pubblicità
+    bannersList.forEach(b => {
       const cell = document.getElementById(`b-clicks-${b.id}`);
-      if (cell && bannerMonthTotals[b.id] !== undefined) {
-        cell.textContent = bannerMonthTotals[b.id] + " click";
+      if (cell) {
+        let bTotal = 0;
+        Object.values(activeMonthArchive.days).forEach(dayRec => {
+          bTotal += Number(dayRec[b.id]) || 0;
+        });
+        cell.textContent = bTotal + " click";
       }
     });
   }
 
   // ==================== GENERAZIONE PDF 1: ANAGRAFICA CLIENTE ====================
   function downloadClientRegistryPDF(clientId) {
-    const c = db.clients.find(item => item.id === clientId);
+    const c = clientsList.find(item => item.id === clientId);
     if (!c || !window.jspdf) return;
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const todayStr = new Date().toLocaleDateString("it-IT");
-    const clientBanners = db.banners.filter(b => b.clientId === c.id);
+    const clientBanners = bannersList.filter(b => b.clientId === c.id);
 
-    // Header
     doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 38, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("BRUNORACHIELE.IT", 16, 17);
+    doc.text("brunorachiele.it", 16, 17);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(203, 213, 225);
@@ -1250,7 +1376,7 @@
     doc.setTextColor(30, 58, 138);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text(`2. FORMATI E SPAZI PUBBLICITARI ATTIVI (${clientBanners.length})`, 16, y);
+    doc.text(`2. FORMATI E SPAZI PUBBLICITARI ASSOCIATI (${clientBanners.length})`, 16, y);
     doc.line(16, y + 2, 194, y + 2);
     y += 10;
 
@@ -1302,9 +1428,8 @@
   // ==================== GENERAZIONE PDF 2: REPORT CLICK GIORNO PER GIORNO ====================
   function downloadClientMonthlyPDF(clientId) {
     document.getElementById("statsClientFilter").value = clientId;
-    loadMonthlyClickBreakdown().then(() => {
-      downloadMonthlyClicksPDF();
-    });
+    renderMonthFromArchiveOrLive();
+    downloadMonthlyClicksPDF();
   }
 
   function downloadMonthlyClicksPDF() {
@@ -1314,17 +1439,16 @@
 
     const monthVal = document.getElementById("statsMonthPicker").value;
     const clientFilter = document.getElementById("statsClientFilter").value;
-    const clientObj = clientFilter !== "ALL" ? db.clients.find(c => c.id === clientFilter) : null;
+    const clientObj = clientFilter !== "ALL" ? clientsList.find(c => c.id === clientFilter) : null;
     const subjectTitle = clientObj ? clientObj.name : "Riepilogo Generale Portale";
     const totalClicksMonth = currentMonthlyRows.reduce((acc, r) => acc + r.clicks, 0);
 
-    // Header
     doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 38, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(17);
-    doc.text("BRUNORACHIELE.IT • REPORT TRAFFICO & CLICK", 16, 16);
+    doc.text("brunorachiele.it • REPORT TRAFFICO & CLICK", 16, 16);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(203, 213, 225);
@@ -1386,28 +1510,27 @@
 
   // ==================== RENDERING TABELLE E SELECT ====================
   function renderAllUI() {
-    // Popola dropdown clienti in Gestione Pubblicità e in Statistiche
     const bSelect = document.getElementById("bClientId");
     const sSelect = document.getElementById("statsClientFilter");
     const prevFilter = sSelect.value;
 
-    if (db.clients.length === 0) {
+    if (clientsList.length === 0) {
       bSelect.innerHTML = '<option value="">-- Crea prima un cliente nella scheda Gestione Clienti --</option>';
     } else {
-      bSelect.innerHTML = db.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+      bSelect.innerHTML = clientsList.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
     }
 
     sSelect.innerHTML = '<option value="ALL">Tutti i Clienti</option>' +
-      db.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+      clientsList.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
     if (prevFilter) sSelect.value = prevFilter;
 
     // Tabella Clienti
     const cTbody = document.getElementById("clientsTable");
-    if (db.clients.length === 0) {
-      cTbody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessun cliente registrato. Compila il modulo qui sopra per iniziare.</td></tr>';
+    if (clientsList.length === 0) {
+      cTbody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessun cliente registrato. Compila il modulo qui sopra per salvarlo in clients/clients.json.</td></tr>';
     } else {
-      cTbody.innerHTML = db.clients.map(c => {
-        const countBanners = db.banners.filter(b => b.clientId === c.id).length;
+      cTbody.innerHTML = clientsList.map(c => {
+        const countBanners = bannersList.filter(b => b.clientId === c.id).length;
         return `
           <tr>
             <td><strong>${c.name}</strong><br><small style="color:#64748b;">${c.contactPerson || ""}</small></td>
@@ -1430,16 +1553,16 @@
 
     // Tabella Banner
     const bTbody = document.getElementById("bannersTable");
-    if (db.banners.length === 0) {
+    if (bannersList.length === 0) {
       bTbody.innerHTML = '<tr><td colspan="7" style="color:#64748b;">Nessun banner inserito.</td></tr>';
     } else {
-      bTbody.innerHTML = db.banners.map(b => {
-        const owner = db.clients.find(c => c.id === b.clientId);
+      bTbody.innerHTML = bannersList.map(b => {
+        const owner = clientsList.find(c => c.id === b.clientId);
         const slotsTxt = (b.slots || []).map(s => SLOT_LABELS[s] || s).join(", ");
         return `
           <tr>
             <td><img src="${b.imageUrl}" class="thumb" alt="" /></td>
-            <td><strong>${owner ? owner.name : "Cliente rimosso"}</strong><br><small style="color:#1e3a8a; font-weight:600;">${b.title}</small></td>
+            <td><strong>${owner ? owner.name : (b.clientName || "Cliente")}</strong><br><small style="color:#1e3a8a; font-weight:600;">${b.title}</small></td>
             <td>${slotsTxt}</td>
             <td>${b.startDate || "Sempre"} → ${b.endDate || "Illimitata"}</td>
             <td id="b-clicks-${b.id}">0 click</td>
