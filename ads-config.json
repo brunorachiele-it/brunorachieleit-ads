@@ -45,6 +45,21 @@
       "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
       "label": "Spazio Sponsorizzato",
       "active": true
+    },
+    {
+      "id": "ad_1795564143628",
+      "clientId": "cli-1795563309550",
+      "title": "Articoli",
+      "slots": [
+        "in-article-1"
+      ],
+      "weight": 1,
+      "startDate": "2026-11-24",
+      "endDate": "2026-12-31",
+      "imageUrl": "https://ads.brunorachiele.it/banners/1795564141532-Progetto_senza_titolo__5_.png",
+      "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
+      "label": "Spazio Sponsorizzato",
+      "active": true
     }
   ]
 }
