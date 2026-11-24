@@ -1,5 +1,19 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "updatedAt": "2026-11-24",
-  "campaigns": []
+  "clients": [
+    {
+      "id": "cli-1795563309550",
+      "name": "brunorachiele.it",
+      "contactPerson": "Bruno Rachiele",
+      "vatNumber": "",
+      "email": "info@brunorachiele.it",
+      "phone": "3384979980",
+      "planTier": "Promo Interna / Omaggio (0,00 €)",
+      "defaultLabel": "Spazio Sponsorizzato",
+      "notes": "",
+      "active": true
+    }
+  ],
+  "banners": []
 }
