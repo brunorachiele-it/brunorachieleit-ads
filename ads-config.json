@@ -1,5 +1,24 @@
 {
   "version": "1.0",
   "updatedAt": "2026-11-24",
-  "campaigns": []
+  "campaigns": [
+    {
+      "id": "ad-1795557298253",
+      "client": "Prova Bruno Rachiele",
+      "active": true,
+      "slots": [
+        "header-top",
+        "sidebar-rassegna",
+        "in-article-1",
+        "footer-partner"
+      ],
+      "weight": 1,
+      "startDate": "2026-11-24",
+      "endDate": "2026-12-24",
+      "imageUrl": "https://ads.brunorachiele.it/banners/1795557295772-logoorizzontalebianco.png",
+      "targetUrl": "https://www.brunorachiele.it/p/prime-pagine-dei-giornali.html",
+      "altText": "Prova Bruno Rachiele",
+      "label": "Spazio Disponibile"
+    }
+  ]
 }
