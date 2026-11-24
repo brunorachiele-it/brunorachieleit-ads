@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Ad Manager • BrunoRachiele.it</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --primary: #1e3a8a;
+      --primary-hover: #1d4ed8;
+      --dark: #0f172a;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--dark);
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 800;
+    }
+    header span {
+      font-size: 12px;
+      background: rgba(255,255,255,0.14);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 17px;
+      color: var(--dark);
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--dark);
+    }
+    input[type="text"], input[type="password"], input[type="url"], input[type="date"], input[type="number"], select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+    input[type="file"] {
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .slots-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .slot-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); }
+    .btn-danger { background: var(--danger); padding: 6px 10px; font-size: 12px; }
+    .btn-secondary { background: #475569; padding: 6px 10px; font-size: 12px; }
+    .preview-box {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      background: #f8fafc;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-box img {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 6px;
+      margin-top: 6px;
+    }
+    .status-bar {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .status-bar.ok { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .status-bar.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .status-bar.info { display: block; background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      vertical-align: middle;
+    }
+    th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--muted); }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-on { background: #dcfce7; color: #166534; }
+    .badge-off { background: #f1f5f9; color: #64748b; }
+    .thumb { width: 80px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>BrunoRachiele.it • Piattaforma Gestione Pubblicità</h1>
+  <span>ads.brunorachiele.it</span>
+</header>
+
+<div class="container">
+  <div id="statusBar" class="status-bar"></div>
+
+  <!-- CONNESSIONE GITHUB -->
+  <div class="card">
+    <h2>1. Connessione Repository GitHub</h2>
+    <div class="grid-3">
+      <div>
+        <label>Proprietario GitHub (Username)</label>
+        <input type="text" id="ghOwner" placeholder="es. brunorachiele" />
+      </div>
+      <div>
+        <label>Nome Repository</label>
+        <input type="text" id="ghRepo" placeholder="es. ads.brunorachiele.it" />
+      </div>
+      <div>
+        <label>GitHub Personal Access Token (salvato solo nel tuo browser)</label>
+        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" />
+      </div>
+    </div>
+    <button class="btn" onclick="connectAndLoad()">Salva Credenziali e Carica Campagne</button>
+  </div>
+
+  <!-- NUOVA CAMPAGNA / MODIFICA -->
+  <div class="card">
+    <h2 id="formTitle">2. Crea o Modifica Spazio Pubblicitario</h2>
+    <div class="grid-2">
+      <div>
+        <input type="hidden" id="editId" value="" />
+        <label>Nome Azienda / Partner *</label>
+        <input type="text" id="clientName" placeholder="es. Studio Commerciale Rossi" />
+
+        <label>Pacchetto / Etichetta Trasparenza JTI</label>
+        <select id="adLabel">
+          <option value="Spazio Sponsorizzato">Spazio Sponsorizzato (Standard)</option>
+          <option value="Main Partner">Main Partner (Premium)</option>
+          <option value="Partner del Territorio">Partner del Territorio</option>
+          <option value="Spazio Disponibile">Spazio Disponibile (Promo interna)</option>
+        </select>
+
+        <label>Link di Destinazione (URL cliccabile) *</label>
+        <input type="url" id="targetUrl" placeholder="https://www.esempio.it" />
+
+        <label>Dove deve apparire sul sito (Slot) *</label>
+        <div class="slots-box">
+          <label class="slot-item"><input type="checkbox" value="header-top" class="slot-cb" /> Testata (Header Top)</label>
+          <label class="slot-item"><input type="checkbox" value="sidebar-rassegna" class="slot-cb" checked /> Sidebar Rassegna Stampa</label>
+          <label class="slot-item"><input type="checkbox" value="in-article-1" class="slot-cb" /> Dentro gli Articoli</label>
+          <label class="slot-item"><input type="checkbox" value="footer-partner" class="slot-cb" /> Footer Partner</label>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label>Data Inizio</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div>
+            <label>Data Scadenza</label>
+            <input type="date" id="endDate" />
+          </div>
+          <div>
+            <label>Priorità Rotazione (1-5)</label>
+            <input type="number" id="weight" min="1" max="5" value="1" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label>Carica Immagine Banner (PNG, JPG, WebP)</label>
+        <input type="file" id="bannerFile" accept="image/*" onchange="previewLocalFile()" />
+
+        <label>Oppure URL Immagine già caricata</label>
+        <input type="url" id="imageUrl" placeholder="https://ads.brunorachiele.it/banners/..." oninput="updatePreviewFromUrl()" />
+
+        <label>Anteprima Live sul Sito</label>
+        <div class="preview-box" id="previewBox">
+          <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;" id="prevLabel">Spazio Sponsorizzato</span>
+          <img id="prevImg" src="" alt="Anteprima" style="display:none;" />
+          <span id="prevPlaceholder" style="color:#94a3b8; font-size:13px;">Seleziona un'immagine per vedere l'anteprima</span>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px;">
+          <button class="btn btn-success" onclick="saveCampaign()">Pubblica sul Sito</button>
+          <button class="btn btn-secondary" onclick="resetForm()">Annulla / Pulisci</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA CAMPAGNE ATTIVE -->
+  <div class="card">
+    <h2>3. Campagne Attive e Programmate</h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Banner</th>
+            <th>Cliente</th>
+            <th>Slot Assegnati</th>
+            <th>Validità</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="campaignsTable">
+          <tr><td colspan="6" style="color:#64748b;">Inserisci le credenziali GitHub in alto e clicca su "Salva Credenziali e Carica Campagne".</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentConfig = { version: "1.0", updatedAt: "", campaigns: [] };
+  let configSha = null;
+
+  function showStatus(msg, type) {
+    const bar = document.getElementById("statusBar");
+    bar.textContent = msg;
+    bar.className = "status-bar " + type;
+  }
+
+  function loadStoredCreds() {
+    document.getElementById("ghOwner").value = localStorage.getItem("br_ads_owner") || "";
+    document.getElementById("ghRepo").value = localStorage.getItem("br_ads_repo") || "ads.brunorachiele.it";
+    document.getElementById("ghToken").value = localStorage.getItem("br_ads_token") || "";
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById("startDate").value = today;
+  }
+
+  function getCreds() {
+    const owner = document.getElementById("ghOwner").value.trim();
+    const repo = document.getElementById("ghRepo").value.trim();
+    const token = document.getElementById("ghToken").value.trim();
+    if (!owner || !repo || !token) {
+      showStatus("Compila Username, Repository e Token GitHub prima di procedere.", "err");
+      return null;
+    }
+    localStorage.setItem("br_ads_owner", owner);
+    localStorage.setItem("br_ads_repo", repo);
+    localStorage.setItem("br_ads_token", token);
+    return { owner, repo, token };
+  }
+
+  async function connectAndLoad() {
+    const creds = getCreds();
+    if (!creds) return;
+    showStatus("Connessione a GitHub in corso...", "info");
+
+    try {
+      const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
+      const res = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${creds.token}`,
+          "Accept": "application/vnd.github+json"
+        }
+      });
+
+      if (!res.ok) throw new Error("Impossibile leggere ads-config.json (verifica nome repo e permessi Token).");
+      const data = await res.json();
+      configSha = data.sha;
+      const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
+      currentConfig = JSON.parse(decoded);
+      renderTable();
+      showStatus("Connesso con successo! Campagne caricate.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  function previewLocalFile() {
+    const file = document.getElementById("bannerFile").files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = document.getElementById("prevImg");
+      img.src = e.target.result;
+      img.style.display = "block";
+      document.getElementById("prevPlaceholder").style.display = "none";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updatePreviewFromUrl() {
+    const url = document.getElementById("imageUrl").value.trim();
+    const img = document.getElementById("prevImg");
+    if (url) {
+      img.src = url;
+      img.style.display = "block";
+      document.getElementById("prevPlaceholder").style.display = "none";
+    }
+  }
+
+  async function uploadBannerToGitHub(creds, file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async function () {
+        try {
+          const base64Content = reader.result.split(",")[1];
+          const cleanName = Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const path = `banners/${cleanName}`;
+          const apiUrl = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`;
+
+          const res = await fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${creds.token}`,
+              "Accept": "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              message: `Upload banner ${cleanName}`,
+              content: base64Content
+            })
+          });
+
+          if (!res.ok) throw new Error("Errore durante il caricamento dell'immagine su GitHub.");
+          resolve(`https://ads.brunorachiele.it/${path}`);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function pushConfigToGitHub(creds) {
+    currentConfig.updatedAt = new Date().toISOString().slice(0, 10);
+    const jsonString = JSON.stringify(currentConfig, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+
+    const apiUrl = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/ads-config.json`;
+    const res = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${creds.token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Aggiornamento campagne pubblicitarie",
+        content: encoded,
+        sha: configSha
+      })
+    });
+
+    if (!res.ok) throw new Error("Errore nel salvataggio di ads-config.json.");
+    const updated = await res.json();
+    configSha = updated.content.sha;
+  }
+
+  async function saveCampaign() {
+    const creds = getCreds();
+    if (!creds) return;
+
+    const client = document.getElementById("clientName").value.trim();
+    const targetUrl = document.getElementById("targetUrl").value.trim();
+    const label = document.getElementById("adLabel").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const weight = Number(document.getElementById("weight").value) || 1;
+    const slots = Array.from(document.querySelectorAll(".slot-cb:checked")).map(cb => cb.value);
+    const file = document.getElementById("bannerFile").files[0];
+    let imageUrl = document.getElementById("imageUrl").value.trim();
+    const editId = document.getElementById("editId").value;
+
+    if (!client || !targetUrl || slots.length === 0) {
+      showStatus("Inserisci Nome Azienda, Link di destinazione e almeno uno Slot.", "err");
+      return;
+    }
+
+    if (!file && !imageUrl) {
+      showStatus("Carica un file immagine oppure incolla l'URL del banner.", "err");
+      return;
+    }
+
+    try {
+      showStatus("Salvataggio e pubblicazione in corso...", "info");
+      if (!configSha) await connectAndLoad();
+
+      if (file) {
+        imageUrl = await uploadBannerToGitHub(creds, file);
+      }
+
+      const campaignObj = {
+        id: editId || "ad-" + Date.now(),
+        client,
+        active: true,
+        slots,
+        weight,
+        startDate,
+        endDate,
+        imageUrl,
+        targetUrl,
+        altText: client,
+        label
+      };
+
+      if (editId) {
+        const idx = currentConfig.campaigns.findIndex(c => c.id === editId);
+        if (idx !== -1) currentConfig.campaigns[idx] = campaignObj;
+      } else {
+        currentConfig.campaigns.push(campaignObj);
+      }
+
+      await pushConfigToGitHub(creds);
+      renderTable();
+      resetForm();
+      showStatus("Pubblicato! Il banner sarà visibile sul sito entro 1-2 minuti.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  function editCampaign(id) {
+    const c = currentConfig.campaigns.find(item => item.id === id);
+    if (!c) return;
+    document.getElementById("formTitle").textContent = "Modifica Campagna: " + c.client;
+    document.getElementById("editId").value = c.id;
+    document.getElementById("clientName").value = c.client;
+    document.getElementById("adLabel").value = c.label || "Spazio Sponsorizzato";
+    document.getElementById("targetUrl").value = c.targetUrl;
+    document.getElementById("startDate").value = c.startDate || "";
+    document.getElementById("endDate").value = c.endDate || "";
+    document.getElementById("weight").value = c.weight || 1;
+    document.getElementById("imageUrl").value = c.imageUrl;
+    document.querySelectorAll(".slot-cb").forEach(cb => {
+      cb.checked = c.slots.includes(cb.value);
+    });
+    updatePreviewFromUrl();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function toggleCampaign(id) {
+    const creds = getCreds();
+    if (!creds) return;
+    const c = currentConfig.campaigns.find(item => item.id === id);
+    if (!c) return;
+    c.active = !c.active;
+    try {
+      showStatus("Aggiornamento stato...", "info");
+      await pushConfigToGitHub(creds);
+      renderTable();
+      showStatus("Stato aggiornato.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  async function deleteCampaign(id) {
+    if (!confirm("Vuoi eliminare definitivamente questa campagna?")) return;
+    const creds = getCreds();
+    if (!creds) return;
+    currentConfig.campaigns = currentConfig.campaigns.filter(item => item.id !== id);
+    try {
+      showStatus("Eliminazione in corso...", "info");
+      await pushConfigToGitHub(creds);
+      renderTable();
+      showStatus("Campagna eliminata.", "ok");
+    } catch (e) {
+      showStatus(e.message, "err");
+    }
+  }
+
+  function resetForm() {
+    document.getElementById("formTitle").textContent = "2. Crea o Modifica Spazio Pubblicitario";
+    document.getElementById("editId").value = "";
+    document.getElementById("clientName").value = "";
+    document.getElementById("targetUrl").value = "";
+    document.getElementById("imageUrl").value = "";
+    document.getElementById("bannerFile").value = "";
+    document.getElementById("endDate").value = "";
+    document.getElementById("weight").value = 1;
+    document.getElementById("prevImg").style.display = "none";
+    document.getElementById("prevPlaceholder").style.display = "block";
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("campaignsTable");
+    if (!currentConfig.campaigns || currentConfig.campaigns.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:#64748b;">Nessuna campagna ancora inserita.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = currentConfig.campaigns.map(c => `
+      <tr>
+        <td><img src="${c.imageUrl}" class="thumb" alt="" /></td>
+        <td><strong>${c.client}</strong><br><small style="color:#64748b;">${c.label}</small></td>
+        <td>${c.slots.join(", ")}</td>
+        <td>${c.startDate || "Sempre"} → ${c.endDate || "Illimitata"}</td>
+        <td><span class="badge ${c.active ? "badge-on" : "badge-off"}">${c.active ? "Attivo" : "In pausa"}</span></td>
+        <td>
+          <button class="btn btn-secondary" onclick="editCampaign('${c.id}')">Modifica</button>
+          <button class="btn btn-secondary" onclick="toggleCampaign('${c.id}')">${c.active ? "Pausa" : "Attiva"}</button>
+          <button class="btn btn-danger" onclick="deleteCampaign('${c.id}')">Elimina</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  loadStoredCreds();
+</script>
+</body>
+</html>
