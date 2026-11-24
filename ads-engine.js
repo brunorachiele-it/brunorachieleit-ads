@@ -2,6 +2,7 @@
   "use strict";
 
   const CONFIG_URL = "https://ads.brunorachiele.it/ads-config.json";
+  const COUNTER_NAMESPACE = "brunorachiele_ads_v2";
 
   function injectStyles() {
     if (document.getElementById("br-ads-engine-css")) return;
@@ -57,7 +58,7 @@
     return true;
   }
 
-  function pickWeightedCampaign(list) {
+  function pickWeightedBanner(list) {
     if (!list || list.length === 0) return null;
     if (list.length === 1) return list[0];
 
@@ -71,41 +72,55 @@
     return list[0];
   }
 
-  function trackEvent(eventName, campaign, slotName) {
+  // Registra il click giornaliero sul contatore serverless + Google Analytics 4
+  function recordClick(banner, clientName, slotName) {
+    const today = new Date().toISOString().slice(0, 10);
+    const safeId = String(banner.id).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const dailyKey = `${safeId}_${today}`;
+
+    try {
+      fetch(`https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up`, {
+        mode: "cors",
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+
     if (typeof window.gtag === "function") {
-      window.gtag("event", eventName, {
+      window.gtag("event", "ad_click", {
         event_category: "Advertising_B2B",
-        event_label: campaign.client + " (" + campaign.id + ")",
+        event_label: `${clientName} - ${banner.title || banner.id}`,
         ad_slot: slotName
       });
     }
   }
 
-  function renderSlot(slotEl, campaign, slotName) {
-    if (!campaign.imageUrl) return;
+  function renderSlot(slotEl, banner, clientObj, slotName) {
+    if (!banner.imageUrl) return;
+    const clientName = clientObj ? clientObj.name : (banner.client || "Partner");
+    const labelText = banner.label || (clientObj && clientObj.defaultLabel) || "Spazio Sponsorizzato";
 
     const wrapper = document.createElement("div");
     wrapper.className = "br-ad-wrapper";
 
     const label = document.createElement("span");
     label.className = "br-ad-label";
-    label.textContent = campaign.label || "Spazio Sponsorizzato";
+    label.textContent = labelText;
 
     const link = document.createElement("a");
     link.className = "br-ad-link";
-    link.href = campaign.targetUrl || "#";
+    link.href = banner.targetUrl || "#";
     link.target = "_blank";
     link.rel = "sponsored noopener noreferrer";
-    link.title = campaign.altText || campaign.client;
+    link.title = banner.title || clientName;
 
     const img = document.createElement("img");
     img.className = "br-ad-img";
-    img.src = campaign.imageUrl;
-    img.alt = campaign.altText || campaign.client;
+    img.src = banner.imageUrl;
+    img.alt = banner.title || clientName;
     img.loading = "lazy";
 
     link.addEventListener("click", function () {
-      trackEvent("ad_click", campaign, slotName);
+      recordClick(banner, clientName, slotName);
     });
 
     link.appendChild(img);
@@ -114,8 +129,6 @@
 
     slotEl.innerHTML = "";
     slotEl.appendChild(wrapper);
-
-    trackEvent("ad_impression", campaign, slotName);
   }
 
   async function initAds() {
@@ -130,22 +143,32 @@
       if (!response.ok) return;
 
       const data = await response.json();
-      const campaigns = Array.isArray(data.campaigns) ? data.campaigns : [];
+      const clients = Array.isArray(data.clients) ? data.clients : [];
+      // Supporta sia il nuovo array "banners" sia eventuali vecchie voci "campaigns"
+      const banners = Array.isArray(data.banners)
+        ? data.banners
+        : (Array.isArray(data.campaigns) ? data.campaigns : []);
+
+      const clientMap = {};
+      clients.forEach(c => { clientMap[c.id] = c; });
 
       slotElements.forEach(function (el) {
         const slotName = el.getAttribute("data-slot");
-        const eligible = campaigns.filter(function (c) {
+        const eligible = banners.filter(function (b) {
+          const owner = b.clientId ? clientMap[b.clientId] : null;
+          if (owner && owner.active === false) return false;
           return (
-            c.active === true &&
-            Array.isArray(c.slots) &&
-            c.slots.includes(slotName) &&
-            isDateValid(c.startDate, c.endDate)
+            b.active === true &&
+            Array.isArray(b.slots) &&
+            b.slots.includes(slotName) &&
+            isDateValid(b.startDate, b.endDate)
           );
         });
 
-        const chosen = pickWeightedCampaign(eligible);
+        const chosen = pickWeightedBanner(eligible);
         if (chosen) {
-          renderSlot(el, chosen, slotName);
+          const owner = chosen.clientId ? clientMap[chosen.clientId] : null;
+          renderSlot(el, chosen, owner, slotName);
         }
       });
     } catch (err) {
