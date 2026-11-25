@@ -1,4 +1,17 @@
 {
   "updatedAt": "2026-11-25",
-  "clients": []
+  "clients": [
+    {
+      "id": "cli-1795565647008",
+      "name": "brunorachiele.it",
+      "contactPerson": "Bruno Rachiele",
+      "vatNumber": "",
+      "email": "info@brunorachiele.it",
+      "phone": "+39 3384979980",
+      "planTier": "Promo Interna / Omaggio (0,00 €)",
+      "defaultLabel": "Spazio Disponibile",
+      "notes": "",
+      "active": true
+    }
+  ]
 }
