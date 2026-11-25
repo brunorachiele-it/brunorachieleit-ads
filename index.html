@@ -1,3 +1,639 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Ad Manager &amp; CRM • brunorachiele.it</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --primary: #1e3a8a;
+      --primary-hover: #1d4ed8;
+      --dark: #0f172a;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --pdf: #0284c7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* SCHERMATA LOGIN */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    }
+    .login-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+    .login-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .login-box h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: var(--dark);
+    }
+    .login-box p {
+      margin: 0 0 20px;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    /* HEADER E NAVIGAZIONE DASHBOARD */
+    .topbar {
+      background: var(--dark);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-brand h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .topbar-pill {
+      font-size: 11px;
+      background: rgba(255,255,255,0.14);
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .nav-tabs {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 24px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .nav-tab {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .container {
+      max-width: 1180px;
+      margin: 24px auto;
+      padding: 0 16px 48px;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* KPI CARDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* CARDS & FORM */
+    .card {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 17px;
+      color: var(--dark);
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 22px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+    input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="month"], input[type="number"], select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13.5px;
+      margin-bottom: 12px;
+      background: #fff;
+      font-family: inherit;
+    }
+    input[type="file"] { margin-bottom: 12px; font-size: 13px; }
+    .slots-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .slot-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-block { width: 100%; padding: 12px; font-size: 14.5px; }
+    .btn-success { background: var(--success); }
+    .btn-pdf { background: var(--pdf); padding: 6px 10px; font-size: 12px; }
+    .btn-danger { background: var(--danger); padding: 6px 10px; font-size: 12px; }
+    .btn-secondary { background: #475569; padding: 6px 10px; font-size: 12px; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.35);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    .preview-box {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      background: #f8fafc;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-box img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 6px;
+      margin-top: 6px;
+    }
+    .status-bar {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .status-bar.ok { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .status-bar.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .status-bar.info { display: block; background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      vertical-align: middle;
+    }
+    th { background: #f8fafc; font-size: 11.5px; text-transform: uppercase; color: var(--muted); }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-on { background: #dcfce7; color: #166534; }
+    .badge-off { background: #f1f5f9; color: #64748b; }
+    .thumb { width: 84px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
+    .actions-cell { display: flex; flex-wrap: wrap; gap: 5px; }
+    .bar-track {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: var(--primary);
+      height: 100%;
+      border-radius: 999px;
+    }
+    .storage-note {
+      font-size: 12px;
+      color: var(--muted);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== 1. SCHERMATA DI ACCESSO ==================== -->
+<div id="loginScreen" class="login-wrapper">
+  <div class="login-box">
+    <span class="login-badge">Area Riservata • brunorachiele.it</span>
+    <h1>Accesso Ad Manager</h1>
+    <p>Inserisci le credenziali del repository GitHub per gestire clienti (<code>clients/</code>), banner e archivio storico mensile (<code>stats/</code>).</p>
+
+    <div id="loginError" class="status-bar err"></div>
+
+    <label>Proprietario / Organizzazione GitHub</label>
+    <input type="text" id="loginOwner" placeholder="brunorachiele-it" />
+
+    <label>Nome Repository</label>
+    <input type="text" id="loginRepo" placeholder="brunorachieleit-ads" />
+
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="loginToken" placeholder="github_pat_xxxxxxxxxxxx" />
+
+    <button class="btn btn-block" onclick="handleLogin(false)">Accedi alla Piattaforma</button>
+  </div>
+</div>
+
+<!-- ==================== 2. DASHBOARD PRINCIPALE ==================== -->
+<div id="appShell" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <h1>brunorachiele.it • Ad Server &amp; CRM</h1>
+      <span class="topbar-pill" id="repoBadge">brunorachiele-it/brunorachieleit-ads</span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn btn-outline" onclick="syncAndArchiveCurrentMonth()">Sincronizza e Archivia Click</button>
+      <button class="btn btn-outline" onclick="logout()">Esci</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="tab-overview" onclick="switchTab('tab-overview', this)">Panoramica &amp; Storico Click</button>
+    <button class="nav-tab" data-tab="tab-clients" onclick="switchTab('tab-clients', this)">Gestione Clienti (clients/)</button>
+    <button class="nav-tab" data-tab="tab-banners" onclick="switchTab('tab-banners', this)">Gestione Pubblicità (Banner)</button>
+  </div>
+
+  <div class="container">
+    <div id="statusBar" class="status-bar"></div>
+
+    <!-- ==================== TAB A: PANORAMICA & CLICK ==================== -->
+    <div id="tab-overview" class="tab-panel active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Click Totali Storici</span>
+          <span class="kpi-value" id="kpiTotalClicks">0</span>
+          <div class="kpi-sub">Somma di tutti i mesi archiviati</div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Click nel Mese Selezionato</span>
+          <span class="kpi-value" id="kpiMonthClicks">0</span>
+          <div class="kpi-sub" id="kpiMonthLabel">Mese corrente</div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Clienti Registrati</span>
+          <span class="kpi-value" id="kpiActiveClients">0</span>
+          <div class="kpi-sub">Salvati in <code>clients/clients.json</code></div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Banner Pubblicati</span>
+          <span class="kpi-value" id="kpiActiveBanners">0</span>
+          <div class="kpi-sub">Formati attivi sul portale</div>
+        </div>
+      </div>
+
+      <!-- FILTRO MENSILE E REPORT PDF GIORNO PER GIORNO -->
+      <div class="card">
+        <h2>
+          <span>Riepilogo Click Giorno per Giorno (Archivio <code>stats/AAAA-MM.json</code>)</span>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <select id="statsClientFilter" style="width:auto; margin:0;" onchange="renderMonthFromArchiveOrLive()">
+              <option value="ALL">Tutti i Clienti</option>
+            </select>
+            <input type="month" id="statsMonthPicker" style="width:auto; margin:0;" onchange="loadMonthStats(false)" />
+            <button class="btn btn-pdf" style="padding:8px 14px; font-size:13px;" onclick="downloadMonthlyClicksPDF()">Scarica PDF Report Click Mese</button>
+          </div>
+        </h2>
+
+        <div class="storage-note" id="archiveStatusNote">
+          I dati mensili vengono salvati nella cartella <strong>stats/</strong> su GitHub: puoi selezionare qualsiasi mese passato e scaricare il PDF riepilogativo per il cliente.
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:140px;">Data</th>
+                <th style="width:110px;">Click del Giorno</th>
+                <th>Distribuzione Visiva</th>
+                <th>Dettaglio Banner Cliccati</th>
+              </tr>
+            </thead>
+            <tbody id="dailyClicksTable">
+              <tr><td colspan="4" style="color:#64748b;">Caricamento statistiche...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CLASSIFICA CLICK PER CLIENTE E BANNER -->
+      <div class="card">
+        <h2>Riepilogo Click del Mese per Cliente e Singolo Banner</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Banner / Formato</th>
+                <th>Posizione (Slot)</th>
+                <th>Click Mese Selezionato</th>
+                <th>Report PDF Cliente</th>
+              </tr>
+            </thead>
+            <tbody id="bannerStatsTable">
+              <tr><td colspan="5" style="color:#64748b;">Nessun dato disponibile.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB B: GESTIONE CLIENTI ==================== -->
+    <div id="tab-clients" class="tab-panel">
+      <div class="card">
+        <h2 id="clientFormTitle">Nuova Anagrafica Cliente / Inserzionista</h2>
+        <div class="storage-note">
+          Le anagrafiche sono salvate separatamente nel file <strong>clients/clients.json</strong>: anche aggiornando <code>index.html</code> i tuoi clienti restano al sicuro.
+        </div>
+        <input type="hidden" id="editClientId" value="" />
+        <div class="grid-3">
+          <div>
+            <label>Ragione Sociale / Nome Attività *</label>
+            <input type="text" id="cName" placeholder="es. Studio Legale Bianchi" />
+          </div>
+          <div>
+            <label>Referente / Legale Rappresentante</label>
+            <input type="text" id="cContact" placeholder="es. Avv. Luca Bianchi" />
+          </div>
+          <div>
+            <label>Partita IVA / Codice Fiscale</label>
+            <input type="text" id="cVat" placeholder="es. IT01234567890" />
+          </div>
+        </div>
+        <div class="grid-3">
+          <div>
+            <label>Email Cliente</label>
+            <input type="email" id="cEmail" placeholder="es. info@studiobianchi.it" />
+          </div>
+          <div>
+            <label>Telefono / WhatsApp</label>
+            <input type="text" id="cPhone" placeholder="es. +39 333 1234567" />
+          </div>
+          <div>
+            <label>Pacchetto Commerciale</label>
+            <select id="cPlan">
+              <option value="START Mensile (25,00 € / mese)">START Mensile (25,00 € / mese)</option>
+              <option value="START Annuale (250,00 € / anno)">START Annuale (250,00 € / anno)</option>
+              <option value="BUSINESS Mensile (50,00 € / mese)">BUSINESS Mensile (50,00 € / mese)</option>
+              <option value="BUSINESS Annuale (500,00 € / anno)">BUSINESS Annuale (500,00 € / anno)</option>
+              <option value="MAIN PARTNER Mensile (100,00 € / mese)">MAIN PARTNER Mensile (100,00 € / mese)</option>
+              <option value="MAIN PARTNER Annuale (1.000,00 € / anno)">MAIN PARTNER Annuale (1.000,00 € / anno)</option>
+              <option value="Promo Interna / Omaggio (0,00 €)">Promo Interna / Omaggio (0,00 €)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Etichetta Trasparenza Predefinita (Standard JTI)</label>
+            <select id="cDefaultLabel">
+              <option value="Spazio Sponsorizzato">Spazio Sponsorizzato</option>
+              <option value="Main Partner">Main Partner</option>
+              <option value="Partner del Territorio">Partner del Territorio</option>
+              <option value="Spazio Disponibile">Spazio Disponibile</option>
+            </select>
+          </div>
+          <div>
+            <label>Note Contrattuali (es. Lettera d'Intenti, Rassegna Stampa inclusa)</label>
+            <input type="text" id="cNotes" placeholder="es. Adesione senza anticipo - Rassegna Stampa attiva" />
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-success" onclick="saveClient()">Salva Anagrafica in clients/</button>
+          <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetClientForm()">Pulisci Campi</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Elenco Clienti Registrati</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente / Azienda</th>
+                <th>Contatti &amp; P.IVA</th>
+                <th>Pacchetto</th>
+                <th>Banner Associati</th>
+                <th>Stato</th>
+                <th>Azioni &amp; PDF Anagrafica</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTable">
+              <tr><td colspan="6" style="color:#64748b;">Nessun cliente registrato.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB C: GESTIONE PUBBLICITÀ (BANNER) ==================== -->
+    <div id="tab-banners" class="tab-panel">
+      <div class="card">
+        <h2 id="bannerFormTitle">Aggiungi Banner Pubblicitario a un Cliente</h2>
+        <div class="grid-2">
+          <div>
+            <input type="hidden" id="editBannerId" value="" />
+
+            <label>Seleziona Cliente *</label>
+            <select id="bClientId"></select>
+
+            <label>Nome / Formato del Banner (es. Orizzontale Header o Piccolo Sidebar) *</label>
+            <input type="text" id="bTitle" placeholder="es. Banner Orizzontale Header oppure Banner Piccolo Sidebar" />
+
+            <label>Link di Destinazione (URL cliccabile) *</label>
+            <input type="url" id="bTargetUrl" placeholder="https://www.sito-cliente.it" />
+
+            <label>Posizione sul Sito (Slot) *</label>
+            <div class="slots-box">
+              <label class="slot-item"><input type="checkbox" value="header-top" class="slot-cb" /> Testata Alta (Header Top)</label>
+              <label class="slot-item"><input type="checkbox" value="sidebar-rassegna" class="slot-cb" checked /> Sidebar (Laterale)</label>
+              <label class="slot-item"><input type="checkbox" value="in-article-1" class="slot-cb" /> Dentro gli Articoli</label>
+              <label class="slot-item"><input type="checkbox" value="footer-partner" class="slot-cb" /> Footer Partner</label>
+            </div>
+
+            <div class="grid-3">
+              <div>
+                <label>Data Inizio</label>
+                <input type="date" id="bStartDate" />
+              </div>
+              <div>
+                <label>Data Scadenza</label>
+                <input type="date" id="bEndDate" />
+              </div>
+              <div>
+                <label>Priorità (1-5)</label>
+                <input type="number" id="bWeight" min="1" max="5" value="1" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label>Carica Immagine Banner (PNG, JPG, WebP)</label>
+            <input type="file" id="bFile" accept="image/*" onchange="previewLocalBanner()" />
+
+            <label>Oppure URL Immagine già caricata</label>
+            <input type="url" id="bImageUrl" placeholder="https://ads.brunorachiele.it/banners/..." oninput="updatePreviewFromUrl()" />
+
+            <label>Anteprima Banner</label>
+            <div class="preview-box">
+              <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;">Spazio Sponsorizzato</span>
+              <img id="bPrevImg" src="" alt="Anteprima" style="display:none;" />
+              <span id="bPrevPlaceholder" style="color:#94a3b8; font-size:13px;">Carica un'immagine (orizzontale per testata o quadrata/verticale per sidebar)</span>
+            </div>
+
+            <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-success" onclick="saveBanner()">Pubblica Banner sul Sito</button>
+              <button class="btn btn-secondary" style="padding:10px 14px; font-size:13.5px;" onclick="resetBannerForm()">Annulla / Pulisci</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tutti i Banner Pubblicati (Multi-Formato)</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Anteprima</th>
+                <th>Cliente &amp; Formato</th>
+                <th>Slot Assegnati</th>
+                <th>Validità</th>
+                <th>Click Mese</th>
+                <th>Stato</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="bannersTable">
+              <tr><td colspan="7" style="color:#64748b;">Nessun banner inserito.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
   const COUNTER_NAMESPACE = "brunorachiele_ads_v2";
   let creds = null;
@@ -147,7 +783,6 @@
         );
       }
 
-      // Migrazione automatica se esistevano vecchie "campaigns"
       if (Array.isArray(configRes.json.campaigns) && configRes.json.campaigns.length > 0 && bannersList.length === 0) {
         configRes.json.campaigns.forEach(old => {
           const cid = "cli-" + old.id;
@@ -996,3 +1631,5 @@
 
   initLoginScreen();
 </script>
+</body>
+</html>
