@@ -2,7 +2,7 @@
   "use strict";
 
   const CONFIG_URL = "https://ads.brunorachiele.it/ads-config.json";
-  const COUNTER_NAMESPACE = "brunorachiele_it_ads";
+  const TRACKER_URL = "https://script.google.com/macros/s/AKfycbz3YlcIjiZUTS4JJEyc8csEDoUQ1X-fuQwmpObEF9yiZv6Y2bMD96NvZkMIf5f01V9P6Q/exec";
 
   function injectStyles() {
     if (document.getElementById("br-ads-engine-css")) return;
@@ -73,19 +73,15 @@
   }
 
   function recordClickAndOpen(banner, slotName) {
-    const today = new Date().toISOString().slice(0, 10);
-    const safeId = String(banner.id).replace(/[^a-zA-Z0-9_-]/g, "_");
-    const dailyKey = `${safeId}_${today}`;
-    const pingUrl = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up?t=${Date.now()}`;
+    const clientName = encodeURIComponent(banner.clientName || "Partner");
+    const bId = encodeURIComponent(banner.id);
+    const sName = encodeURIComponent(slotName || "");
+    const pingUrl = `${TRACKER_URL}?id=${bId}&client=${clientName}&slot=${sName}&t=${Date.now()}`;
 
-    // 1. Pixel GET puro: il browser invia subito una richiesta GET valida senza blocchi CORS
+    // Pixel GET verso Google Apps Script
     const pixel = new Image();
     pixel.src = pingUrl;
 
-    // 2. Seconda chiamata fetch GET di sicurezza
-    fetch(pingUrl, { method: "GET", mode: "no-cors" }).catch(() => {});
-
-    // 3. Google Analytics 4
     if (typeof window.gtag === "function") {
       window.gtag("event", "ad_click", {
         event_category: "Advertising_B2B",
@@ -94,11 +90,10 @@
       });
     }
 
-    // 4. Apri il sito del cliente dopo 180ms
     if (banner.targetUrl && banner.targetUrl !== "#") {
       setTimeout(function () {
         window.open(banner.targetUrl, "_blank", "noopener,noreferrer");
-      }, 180);
+      }, 200);
     }
   }
 
