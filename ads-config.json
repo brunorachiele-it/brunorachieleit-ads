@@ -1,20 +1,6 @@
 {
-  "version": "2.0",
+  "version": "2.1",
   "updatedAt": "2026-11-25",
-  "clients": [
-    {
-      "id": "cli-1795563309550",
-      "name": "brunorachiele.it",
-      "contactPerson": "Bruno Rachiele",
-      "vatNumber": "",
-      "email": "info@brunorachiele.it",
-      "phone": "3384979980",
-      "planTier": "Promo Interna / Omaggio (0,00 €)",
-      "defaultLabel": "Spazio Sponsorizzato",
-      "notes": "",
-      "active": true
-    }
-  ],
   "banners": [
     {
       "id": "ad_1795563666651",
@@ -29,7 +15,9 @@
       "imageUrl": "https://ads.brunorachiele.it/banners/1795563664743-ACQUISTA_IL_TUO_SPAZIO_PUBBLICITARIO.jpg",
       "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
       "label": "Spazio Sponsorizzato",
-      "active": true
+      "active": true,
+      "clientName": "Partner",
+      "clientActive": true
     },
     {
       "id": "ad_1795563838690",
@@ -44,7 +32,9 @@
       "imageUrl": "https://ads.brunorachiele.it/banners/1795563836537-A_PARTIRE_DA_25_EURO_AL_MESE.png",
       "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
       "label": "Spazio Sponsorizzato",
-      "active": true
+      "active": true,
+      "clientName": "Partner",
+      "clientActive": true
     },
     {
       "id": "ad_1795564143628",
@@ -59,7 +49,9 @@
       "imageUrl": "https://ads.brunorachiele.it/banners/1795564141532-Progetto_senza_titolo__5_.png",
       "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
       "label": "Spazio Sponsorizzato",
-      "active": true
+      "active": true,
+      "clientName": "Partner",
+      "clientActive": true
     }
   ]
 }
