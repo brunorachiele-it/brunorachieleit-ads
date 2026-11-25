@@ -38,7 +38,7 @@
     },
     {
       "id": "ad_1795564143628",
-      "clientId": "cli-1795563309550",
+      "clientId": "cli-1795565647008",
       "title": "Articoli",
       "slots": [
         "in-article-1"
@@ -48,10 +48,10 @@
       "endDate": "2026-12-31",
       "imageUrl": "https://ads.brunorachiele.it/banners/1795564141532-Progetto_senza_titolo__5_.png",
       "targetUrl": "https://www.brunorachiele.it/p/pubblicita-su-brunorachieleit.html",
-      "label": "Spazio Sponsorizzato",
       "active": true,
-      "clientName": "Partner",
-      "clientActive": true
+      "clientName": "brunorachiele.it",
+      "clientActive": true,
+      "label": "Spazio Disponibile"
     }
   ]
 }
