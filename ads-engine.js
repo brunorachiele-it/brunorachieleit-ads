@@ -72,32 +72,33 @@
     return list[0];
   }
 
-  function recordClick(banner, slotName) {
+  function recordClickAndOpen(banner, slotName) {
     const today = new Date().toISOString().slice(0, 10);
     const safeId = String(banner.id).replace(/[^a-zA-Z0-9_-]/g, "_");
     const dailyKey = `${safeId}_${today}`;
-    const endpoint = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up`;
+    const pingUrl = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up?t=${Date.now()}`;
 
-    // 1. Metodo prioritario garantito alla chiusura/navigazione della pagina
-    let sent = false;
-    if (navigator.sendBeacon) {
-      try {
-        sent = navigator.sendBeacon(endpoint);
-      } catch (e) {}
-    }
+    // 1. Pixel GET puro: il browser invia subito una richiesta GET valida senza blocchi CORS
+    const pixel = new Image();
+    pixel.src = pingUrl;
 
-    // 2. Fallback fetch con keepalive
-    if (!sent) {
-      fetch(endpoint, { method: "GET", mode: "no-cors", keepalive: true }).catch(() => {});
-    }
+    // 2. Seconda chiamata fetch GET di sicurezza
+    fetch(pingUrl, { method: "GET", mode: "no-cors" }).catch(() => {});
 
-    // 3. Invio evento anche a Google Analytics 4 (se attivo sul blog)
+    // 3. Google Analytics 4
     if (typeof window.gtag === "function") {
       window.gtag("event", "ad_click", {
         event_category: "Advertising_B2B",
         event_label: `${banner.clientName || "Partner"} - ${banner.title || banner.id}`,
         ad_slot: slotName
       });
+    }
+
+    // 4. Apri il sito del cliente dopo 180ms
+    if (banner.targetUrl && banner.targetUrl !== "#") {
+      setTimeout(function () {
+        window.open(banner.targetUrl, "_blank", "noopener,noreferrer");
+      }, 180);
     }
   }
 
@@ -127,14 +128,8 @@
     img.loading = "lazy";
 
     link.addEventListener("click", function (e) {
-      recordClick(banner, slotName);
-      // Piccola pausa di 120ms per assicurare che il ping di conteggio parta prima dell'apertura del link
-      if (banner.targetUrl && banner.targetUrl !== "#") {
-        e.preventDefault();
-        setTimeout(function () {
-          window.open(banner.targetUrl, "_blank", "noopener,noreferrer");
-        }, 120);
-      }
+      e.preventDefault();
+      recordClickAndOpen(banner, slotName);
     });
 
     link.appendChild(img);
