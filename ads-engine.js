@@ -2,7 +2,7 @@
   "use strict";
 
   const CONFIG_URL = "https://ads.brunorachiele.it/ads-config.json";
-  const COUNTER_NAMESPACE = "brunorachiele_ads_v2";
+  const COUNTER_NAMESPACE = "brunorachiele_it_ads";
 
   function injectStyles() {
     if (document.getElementById("br-ads-engine-css")) return;
@@ -76,14 +76,22 @@
     const today = new Date().toISOString().slice(0, 10);
     const safeId = String(banner.id).replace(/[^a-zA-Z0-9_-]/g, "_");
     const dailyKey = `${safeId}_${today}`;
+    const endpoint = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up`;
 
-    try {
-      fetch(`https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${dailyKey}/up`, {
-        mode: "cors",
-        keepalive: true
-      }).catch(() => {});
-    } catch (e) {}
+    // 1. Metodo prioritario garantito alla chiusura/navigazione della pagina
+    let sent = false;
+    if (navigator.sendBeacon) {
+      try {
+        sent = navigator.sendBeacon(endpoint);
+      } catch (e) {}
+    }
 
+    // 2. Fallback fetch con keepalive
+    if (!sent) {
+      fetch(endpoint, { method: "GET", mode: "no-cors", keepalive: true }).catch(() => {});
+    }
+
+    // 3. Invio evento anche a Google Analytics 4 (se attivo sul blog)
     if (typeof window.gtag === "function") {
       window.gtag("event", "ad_click", {
         event_category: "Advertising_B2B",
@@ -118,8 +126,15 @@
     img.alt = banner.title || clientName;
     img.loading = "lazy";
 
-    link.addEventListener("click", function () {
+    link.addEventListener("click", function (e) {
       recordClick(banner, slotName);
+      // Piccola pausa di 120ms per assicurare che il ping di conteggio parta prima dell'apertura del link
+      if (banner.targetUrl && banner.targetUrl !== "#") {
+        e.preventDefault();
+        setTimeout(function () {
+          window.open(banner.targetUrl, "_blank", "noopener,noreferrer");
+        }, 120);
+      }
     });
 
     link.appendChild(img);
