@@ -416,7 +416,7 @@
         </h2>
 
         <div class="storage-note" id="archiveStatusNote">
-          I dati mensili vengono salvati nella cartella <strong>stats/</strong> su GitHub: puoi selezionare qualsiasi mese passato e scaricare il PDF riepilogativo per il cliente.
+          I dati mensili vengono letti dal tuo Google Sheet e salvati nella cartella <strong>stats/</strong> su GitHub.
         </div>
 
         <div style="overflow-x:auto;">
@@ -635,7 +635,7 @@
 </div>
 
 <script>
-  const COUNTER_NAMESPACE = "brunorachiele_it_ads";
+  const TRACKER_URL = "https://script.google.com/macros/s/AKfycbz3YlcIjiZUTS4JJEyc8csEDoUQ1X-fuQwmpObEF9yiZv6Y2bMD96NvZkMIf5f01V9P6Q/exec";
   let creds = null;
 
   let clientsSha = null;
@@ -1156,18 +1156,7 @@
     document.getElementById("bPrevPlaceholder").style.display = "block";
   }
 
-  // ==================== STATISTICHE MENSILI & ARCHIVIO IN stats/ ====================
-  async function fetchSingleCounter(key) {
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${key}`);
-      if (!res.ok) return 0;
-      const data = await res.json();
-      return Number(data.count) || 0;
-    } catch {
-      return 0;
-    }
-  }
-
+  // ==================== STATISTICHE MENSILI DA GOOGLE SHEET + ARCHIVIO stats/ ====================
   function getDaysInMonth(yearMonth) {
     const [y, m] = yearMonth.split("-").map(Number);
     const daysCount = new Date(y, m, 0).getDate();
@@ -1205,48 +1194,52 @@
     const noteEl = document.getElementById("archiveStatusNote");
 
     document.getElementById("kpiMonthLabel").textContent = "Mese: " + monthVal;
-    tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Lettura archivio mensile e contatori live...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b;">Lettura click dal Google Sheet e archivio GitHub...</td></tr>';
 
     const archivePath = `stats/${monthVal}.json`;
     let existing = null;
     try {
       existing = await ghGetFile(archivePath);
-    } catch (e) {
-      console.warn("File archivio non ancora presente:", e);
-    }
+    } catch (e) {}
 
     currentStatsSha = existing ? existing.sha : null;
     const savedDays = (existing && existing.json && existing.json.days) ? existing.json.days : {};
-
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const currentMonthStr = todayStr.slice(0, 7);
-    const days = getDaysInMonth(monthVal).filter(d => d <= todayStr);
-
     const mergedDays = JSON.parse(JSON.stringify(savedDays));
     let hasChanges = false;
 
-    if ((monthVal === currentMonthStr || !existing) && bannersList.length > 0) {
-      for (const day of days) {
-        if (!mergedDays[day]) mergedDays[day] = {};
-        await Promise.all(bannersList.map(async (b) => {
-          const safeId = String(b.id).replace(/[^a-zA-Z0-9_-]/g, "_");
-          const liveVal = await fetchSingleCounter(`${safeId}_${day}`);
-          const prevVal = Number(mergedDays[day][b.id]) || 0;
-          if (liveVal > prevVal) {
-            mergedDays[day][b.id] = liveVal;
-            hasChanges = true;
-          }
-        }));
+    // Legge i dati aggiornati dal tuo Google Apps Script
+    try {
+      const res = await fetch(`${TRACKER_URL}?action=read&t=${Date.now()}`);
+      if (res.ok) {
+        const sheetData = await res.json();
+        if (sheetData && sheetData.ok && sheetData.days) {
+          Object.entries(sheetData.days).forEach(([dayStr, dayMap]) => {
+            if (dayStr.startsWith(monthVal)) {
+              if (!mergedDays[dayStr]) mergedDays[dayStr] = {};
+              Object.entries(dayMap).forEach(([bId, countVal]) => {
+                const liveVal = Number(countVal) || 0;
+                const prevVal = Number(mergedDays[dayStr][bId]) || 0;
+                if (liveVal !== prevVal) {
+                  mergedDays[dayStr][bId] = liveVal;
+                  hasChanges = true;
+                }
+              });
+            }
+          });
+        }
       }
+    } catch (err) {
+      console.warn("Lettura Google Sheet:", err);
     }
 
+    const todayStr = new Date().toISOString().slice(0, 10);
     activeMonthArchive = {
       month: monthVal,
       updatedAt: todayStr,
       days: mergedDays
     };
 
-    if ((shouldSaveToGitHub || hasChanges) && days.length > 0) {
+    if (shouldSaveToGitHub || hasChanges) {
       try {
         currentStatsSha = await ghPutFile(
           archivePath,
@@ -1254,7 +1247,7 @@
           currentStatsSha,
           `Archivio click mensile ${monthVal}`
         );
-        noteEl.innerHTML = `Archivio <strong>${archivePath}</strong> sincronizzato e salvato su GitHub.`;
+        noteEl.innerHTML = `Archivio <strong>${archivePath}</strong> aggiornato dal tuo Google Sheet e salvato su GitHub.`;
       } catch (e) {
         console.warn("Salvataggio stats rimandato:", e);
       }
@@ -1267,9 +1260,9 @@
   }
 
   async function syncAndArchiveCurrentMonth() {
-    showStatus("Sincronizzazione click live e salvataggio nella cartella stats/ su GitHub...", "info");
+    showStatus("Sincronizzazione click dal Google Sheet e salvataggio in stats/...", "info");
     await loadMonthStats(true);
-    showStatus("Statistiche mensili archiviate con successo in stats/!", "ok");
+    showStatus("Statistiche mensili sincronizzate e archiviate con successo!", "ok");
   }
 
   function renderMonthFromArchiveOrLive() {
